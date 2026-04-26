@@ -21,9 +21,11 @@ export default function LoginPage({ onLogin }) {
 
     try {
       // POST /api/login — body: { email, password }
-      const res = await axios.post('/api/login', form, {
-        withCredentials: true, // refreshToken 쿠키 받기
-      })
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/login`,
+        form, 
+        {withCredentials: true, // refreshToken 쿠키 받기
+        })
 
       // Authorization 헤더에서 access token 추출
       const authHeader = res.headers['authorization']
@@ -52,8 +54,8 @@ export default function LoginPage({ onLogin }) {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>ColonyDrop</h1>
-        <p className={styles.subtitle}>건담 한정판 드롭 플랫폼</p>
+        <h1 className={styles.title}>ColonyDrop0079</h1>
+        <p className={styles.subtitle}>건담 판매 && 소통 플랫폼</p>
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
