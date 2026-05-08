@@ -1,0 +1,84 @@
+.hero {
+  position: relative;
+  height: calc(100vh - 60px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #111;
+}
+
+/* 배경 동영상 */
+.videoBg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.55;
+}
+
+/* 동영상 위 어두운 오버레이 */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+}
+
+/* 텍스트 콘텐츠 - 비디오 위에 표시 */
+.heroInner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 0 24px;
+  width: 100%;
+}
+
+.heroTag {
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.heroTitle {
+  font-size: clamp(52px, 11vw, 100px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -1px;
+  color: #fff;
+  text-align: center;
+  width: 100%;
+}
+
+.heroDesc {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.9;
+}
+
+.heroCta {
+  background: #fff;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 36px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.heroCta:hover {
+  background: #e8e8e8;
+  transform: translateY(-1px);
+}

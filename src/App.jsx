@@ -1,35 +1,31 @@
-import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider, useAuth } from './context/AuthContext'
+import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
-import DashboardPage from './pages/DashboardPage'
+import ProductListPage from './pages/ProductListPage'
+import ProductDetailPage from './pages/ProductDetailPage'
+import PaymentPage from './pages/PaymentPage'
+import OrderHistoryPage from './pages/OrderHistoryPage'
+
+function PrivateRoute({ children }) {
+  const { token } = useAuth()
+  return token ? children : <Navigate to="/login" replace />
+}
 
 export default function App() {
-  const [token, setToken] = useState(() => localStorage.getItem('accessToken'))
-
-  const handleLogin = (newToken) => setToken(newToken)
-  const handleLogout = () => setToken(null)
-
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path="/login"
-          element={
-            token
-              ? <Navigate to="/dashboard" replace />
-              : <LoginPage onLogin={handleLogin} />
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            token
-              ? <DashboardPage token={token} onLogout={handleLogout} />
-              : <Navigate to="/login" replace />
-          }
-        />
-        <Route path="*" element={<Navigate to={token ? '/dashboard' : '/login'} replace />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/products" element={<ProductListPage />} />
+          <Route path="/products/:id" element={<ProductDetailPage />} />
+          <Route path="/payment" element={<PrivateRoute><PaymentPage /></PrivateRoute>} />
+          <Route path="/orders" element={<PrivateRoute><OrderHistoryPage /></PrivateRoute>} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }

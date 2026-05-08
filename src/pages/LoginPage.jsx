@@ -1,97 +1,75 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { useEffect, useRef } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import styles from './LoginPage.module.css'
 
-export default function LoginPage({ onLogin }) {
+const BACKEND_URL = 'https://api.colonydrop0079.com'
+
+const SOCIAL_PROVIDERS = [
+  { id: 'kakao',  label: '카카오로 시작하기', bg: '#FEE500', color: '#000' },
+  { id: 'naver',  label: '네이버로 시작하기', bg: '#03C75A', color: '#fff' },
+  { id: 'google', label: '구글로 시작하기',   bg: '#fff',    color: '#222', border: '1px solid #ddd' },
+]
+
+export default function LoginPage() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({ email: '', password: '' })
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const location = useLocation()
+  const { login, token } = useAuth()
+  const popupRef = useRef(null)
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-    setError('')
-  }
+  useEffect(() => {
+    if (token) navigate('/', { replace: true })
+  }, [token, navigate])
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
+  useEffect(() => {
+    const handleMessage = (e) => {
+      const accessToken =
+        e.data?.accessToken ?? e.data?.token ?? e.data?.access_token
+      if (!accessToken) return
 
-    try {
-      // POST /api/login — body: { email, password }
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/login`,
-        form, 
-        {withCredentials: true, // refreshToken 쿠키 받기
-        })
+      // 팝업 닫기
+      popupRef.current?.close()
 
-      // Authorization 헤더에서 access token 추출
-      const authHeader = res.headers['authorization']
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.replace('Bearer ', '')
-        localStorage.setItem('accessToken', token)
-        onLogin(token)
-        navigate('/dashboard')
+      login(accessToken)
+
+      const state = location.state
+      if (state?.product) {
+        navigate('/payment', { state: { product: state.product } })
       } else {
-        setError('토큰을 받지 못했습니다.')
+        navigate(state?.from ?? '/')
       }
-    } catch (err) {
-      const status = err.response?.status
-      if (status === 401) {
-        setError('이메일 또는 비밀번호가 올바르지 않습니다.')
-      } else if (status === 403) {
-        setError('접근이 거부되었습니다.')
-      } else {
-        setError(`서버 오류 (${status ?? 'network error'})`)
-      }
-    } finally {
-      setLoading(false)
     }
+
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [login, navigate, location.state])
+
+  const openSocialLogin = (provider) => {
+    popupRef.current = window.open(
+      `${BACKEND_URL}/oauth2/authorization/${provider}`,
+      'socialLogin',
+      'width=500,height=700,left=400,top=100'
+    )
   }
 
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>ColonyDrop0079</h1>
-        <p className={styles.subtitle}>건담 판매 && 소통 플랫폼</p>
+        <div className={styles.logo}>colonydrop0079</div>
+        <p className={styles.subtitle}>소셜 계정으로 간편하게 시작하세요</p>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.field}>
-            <label htmlFor="email">이메일</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="example@email.com"
-              required
-              autoComplete="email"
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label htmlFor="password">비밀번호</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="비밀번호 입력"
-              required
-              autoComplete="current-password"
-            />
-          </div>
-
-          {error && <p className={styles.error}>{error}</p>}
-
-          <button type="submit" className={styles.button} disabled={loading}>
-            {loading ? '로그인 중...' : '로그인'}
-          </button>
-        </form>
+        <div className={styles.buttons}>
+          {SOCIAL_PROVIDERS.map((p) => (
+            <button
+              key={p.id}
+              className={styles.socialBtn}
+              style={{ background: p.bg, color: p.color, border: p.border ?? 'none' }}
+              onClick={() => openSocialLogin(p.id)}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   )

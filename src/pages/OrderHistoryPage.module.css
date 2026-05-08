@@ -1,0 +1,105 @@
+.main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 36px 24px 60px;
+}
+
+.heading {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 24px;
+}
+
+.status {
+  color: #aaa;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 80px;
+}
+
+.errorMsg {
+  color: #e03131;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 80px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.productName {
+  font-size: 15px;
+  color: #1a1a1a;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.orderId {
+  font-size: 12px;
+  color: #bbb;
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 100px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.pending {
+  background: #fff3bf;
+  color: #e67700;
+}
+
+.paid {
+  background: #d3f9d8;
+  color: #2f9e44;
+}
+
+.refunded {
+  background: #dbe4ff;
+  color: #3b5bdb;
+}
+
+.cancelled {
+  background: #ffe3e3;
+  color: #c92a2a;
+}
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 12px;
+}
+
+.amount {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.date {
+  font-size: 12px;
+  color: #bbb;
+}

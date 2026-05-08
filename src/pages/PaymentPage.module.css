@@ -1,0 +1,130 @@
+.main {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 36px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.heading {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+.sectionTitle {
+  font-size: 12px;
+  color: #aaa;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+}
+
+.productRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.thumb {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #f0f0f0;
+  border: 1px solid #e8e8e8;
+}
+
+.productName {
+  font-size: 14px;
+  color: #1a1a1a;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.productPrice {
+  font-size: 13px;
+  color: #888;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #888;
+}
+
+.totalAmount {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.errorMsg {
+  font-size: 13px;
+  color: #e03131;
+  background: #fff5f5;
+  border: 1px solid #ffc9c9;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.payBtn {
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: background 0.15s;
+}
+
+.payBtn:hover:not(:disabled) {
+  background: #333;
+}
+
+.payBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.cancelBtn {
+  background: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 14px;
+  color: #888;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.cancelBtn:hover {
+  border-color: #aaa;
+  color: #444;
+}
+
+.backBtn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px 20px;
+  color: #888;
+  font-size: 13px;
+  cursor: pointer;
+  margin-top: 12px;
+}
