@@ -12,7 +12,15 @@ export default function ProductListPage() {
 
   useEffect(() => {
     api.get('/api/products')
-      .then((res) => setProducts(res.data?.products ?? res.data ?? []))
+      .then((res) => {
+        const d = res.data
+        // Spring Page { content: [] } / { products: [] } / 배열 직접 반환 모두 처리
+        const list = Array.isArray(d) ? d
+          : Array.isArray(d?.content) ? d.content
+          : Array.isArray(d?.products) ? d.products
+          : []
+        setProducts(list)
+      })
       .catch(() => setError('상품을 불러오는 데 실패했습니다.'))
       .finally(() => setLoading(false))
   }, [])

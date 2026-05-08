@@ -17,7 +17,14 @@ export default function OrderHistoryPage() {
 
   useEffect(() => {
     api.get('/api/orders')
-      .then((res) => setOrders(res.data?.orders ?? res.data ?? []))
+      .then((res) => {
+        const d = res.data
+        const list = Array.isArray(d) ? d
+          : Array.isArray(d?.content) ? d.content
+          : Array.isArray(d?.orders) ? d.orders
+          : []
+        setOrders(list)
+      })
       .catch(() => setError('주문 내역을 불러오는 데 실패했습니다.'))
       .finally(() => setLoading(false))
   }, [])
