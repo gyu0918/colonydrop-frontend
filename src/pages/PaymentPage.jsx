@@ -53,10 +53,10 @@ export default function PaymentPage() {
 
     IMP.request_pay(
       {
-        pg: 'html5_inicis',
+        pg: 'html5_inicis.INIpayTest',
         pay_method: 'card',
         merchant_uid: merchantUid,
-        name: product.name,
+        name: product.title,
         amount: product.price,
         buyer_name: '',
         buyer_email: '',
@@ -93,11 +93,11 @@ export default function PaymentPage() {
         <div className={styles.card}>
           <h3 className={styles.sectionTitle}>주문 상품</h3>
           <div className={styles.productRow}>
-            {product.imageUrl && (
-              <img src={product.imageUrl} alt={product.name} className={styles.thumb} />
+            {product.imgUrl && (
+              <img src={product.imgUrl} alt={product.title} className={styles.thumb} />
             )}
             <div>
-              <p className={styles.productName}>{product.name}</p>
+              <p className={styles.productName}>{product.title}</p>
               <p className={styles.productPrice}>{product.price?.toLocaleString()}원</p>
             </div>
           </div>

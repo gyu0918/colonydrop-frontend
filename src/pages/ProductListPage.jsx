@@ -14,10 +14,13 @@ export default function ProductListPage() {
     api.get('/api/products')
       .then((res) => {
         const d = res.data
-        // Spring Page { content: [] } / { products: [] } / 배열 직접 반환 모두 처리
+        console.log('[상품 API 응답]', d)
         const list = Array.isArray(d) ? d
           : Array.isArray(d?.content) ? d.content
           : Array.isArray(d?.products) ? d.products
+          : Array.isArray(d?.data) ? d.data
+          : Array.isArray(d?.items) ? d.items
+          : Array.isArray(d?.result) ? d.result
           : []
         setProducts(list)
       })
@@ -45,17 +48,17 @@ export default function ProductListPage() {
               className={styles.card}
               onClick={() => navigate(`/products/${product.id}`)}
             >
-              {product.imageUrl && (
+              {product.imgUrl && (
                 <img
-                  src={product.imageUrl}
-                  alt={product.name}
+                  src={product.imgUrl}
+                  alt={product.title}
                   className={styles.image}
                 />
               )}
               <div className={styles.info}>
-                <p className={styles.name}>{product.name}</p>
+                <p className={styles.name}>{product.title}</p>
                 <p className={styles.price}>{product.price?.toLocaleString()}원</p>
-                {product.stock === 0 && (
+                {product.status === 'SOLD' && (
                   <span className={styles.soldOut}>품절</span>
                 )}
               </div>

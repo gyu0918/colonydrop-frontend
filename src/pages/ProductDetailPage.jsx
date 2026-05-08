@@ -42,28 +42,27 @@ export default function ProductDetailPage() {
 
         {product && (
           <div className={styles.detail}>
-            {product.imageUrl && (
-              <img src={product.imageUrl} alt={product.name} className={styles.image} />
+            {product.imgUrl && (
+              <img src={product.imgUrl} alt={product.title} className={styles.image} />
             )}
             <div className={styles.info}>
-              <h2 className={styles.name}>{product.name}</h2>
+              <h2 className={styles.name}>{product.title}</h2>
               <p className={styles.price}>{product.price?.toLocaleString()}원</p>
               {product.description && (
                 <p className={styles.desc}>{product.description}</p>
               )}
               <div className={styles.stock}>
-                재고:{' '}
-                {product.stock > 0
-                  ? <span className={styles.inStock}>{product.stock}개</span>
+                {product.status === 'SALE'
+                  ? <span className={styles.inStock}>구매 가능</span>
                   : <span className={styles.soldOut}>품절</span>
                 }
               </div>
               <button
                 className={styles.buyBtn}
                 onClick={handleBuy}
-                disabled={product.stock === 0}
+                disabled={product.status === 'SOLD'}
               >
-                {product.stock === 0 ? '품절' : token ? '구매하기' : '로그인 후 구매하기'}
+                {product.status === 'SOLD' ? '품절' : token ? '구매하기' : '로그인 후 구매하기'}
               </button>
             </div>
           </div>
