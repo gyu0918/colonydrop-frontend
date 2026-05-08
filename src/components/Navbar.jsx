@@ -1,10 +1,11 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import styles from './Navbar.module.css'
 
 export default function Navbar() {
   const { token, logout, nickname } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const handleLogout = () => {
     logout()
@@ -28,7 +29,7 @@ export default function Navbar() {
               <button className={styles.logoutBtn} onClick={handleLogout}>로그아웃</button>
             </>
           ) : (
-            <button className={styles.loginBtn} onClick={() => navigate('/login')}>
+            <button className={styles.loginBtn} onClick={() => navigate('/login', { state: { from: location.pathname } })}>
               로그인
             </button>
           )}
