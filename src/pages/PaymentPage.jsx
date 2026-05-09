@@ -37,7 +37,7 @@ export default function PaymentPage() {
     try {
       // 1. 주문 생성
       const { data: order } = await api.post('/api/orders', {
-        productId: product.id,
+        itemId: product.id,
         quantity: 1,
       })
       merchantUid = order.merchantUid ?? order.orderId ?? `order_${Date.now()}`
