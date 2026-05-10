@@ -42,28 +42,33 @@ export default function ProductListPage() {
         )}
 
         <div className={styles.grid}>
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className={styles.card}
-              onClick={() => navigate(`/products/${product.id}`)}
-            >
-              {product.imgUrl && (
-                <img
-                  src={product.imgUrl}
-                  alt={product.title}
-                  className={styles.image}
-                />
-              )}
-              <div className={styles.info}>
-                <p className={styles.name}>{product.title}</p>
-                <p className={styles.price}>{product.price?.toLocaleString()}원</p>
-                {product.status === 'SOLD' && (
-                  <span className={styles.soldOut}>품절</span>
+          {products.map((product) => {
+            const isSoldOut = product.status !== 'SALE'
+            return (
+              <div
+                key={product.id}
+                className={`${styles.card} ${isSoldOut ? styles.soldOutCard : ''}`}
+                onClick={isSoldOut ? undefined : () => navigate(`/products/${product.id}`)}
+              >
+                {product.imgUrl && (
+                  <div className={styles.imageWrapper}>
+                    <img
+                      src={product.imgUrl}
+                      alt={product.title}
+                      className={`${styles.image} ${isSoldOut ? styles.imageSoldOut : ''}`}
+                    />
+                    {isSoldOut && <div className={styles.soldOutOverlay}>품절</div>}
+                  </div>
                 )}
+                <div className={styles.info}>
+                  <p className={styles.name}>{product.title}</p>
+                  <p className={`${styles.price} ${isSoldOut ? styles.priceSoldOut : ''}`}>
+                    {product.price?.toLocaleString()}원
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </main>
     </>
