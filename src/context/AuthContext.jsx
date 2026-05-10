@@ -15,7 +15,16 @@ export function AuthProvider({ children }) {
 
   const user = token ? parseToken(token) : null
   // 닉네임: JWT 페이로드에서 nickname > name > memberId 순으로 추출
-  const nickname = user?.nickname ?? user?.memberName ?? user?.name ?? user?.memberId ?? null
+  // const nickname = user?.nickname ?? user?.memberName ?? user?.name ?? user?.memberId ?? null
+  const nickname = (() => {
+  const raw = user?.memberName ?? user?.nickname ?? user?.name ?? user?.memberId ?? null
+  if (!raw) return null
+  try {
+    return decodeURIComponent(escape(raw))
+  } catch {
+    return raw
+  }
+  })()
 
   const login = (newToken) => {
     localStorage.setItem('accessToken', newToken)
