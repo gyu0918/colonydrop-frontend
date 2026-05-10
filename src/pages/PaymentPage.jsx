@@ -14,6 +14,13 @@ export default function PaymentPage() {
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState('')
 
+  const [buyerName, setBuyerName] = useState('')
+  const [buyerTel, setBuyerTel] = useState('')
+  const [buyerAddr, setBuyerAddr] = useState('')
+  const [agreePrivacy, setAgreePrivacy] = useState(false)
+  const [agreeTerms, setAgreeTerms] = useState(false)
+  const [showPrivacyDetail, setShowPrivacyDetail] = useState(false)
+
   if (!product) {
     return (
       <>
@@ -28,6 +35,17 @@ export default function PaymentPage() {
     )
   }
 
+  const allAgreed = agreePrivacy && agreeTerms
+
+  const handleAllAgree = (e) => {
+    const checked = e.target.checked
+    setAgreePrivacy(checked)
+    setAgreeTerms(checked)
+  }
+
+  const canPay =
+    buyerName.trim() && buyerTel.trim() && buyerAddr.trim() && agreePrivacy && agreeTerms && !paying
+
   const handlePayment = async () => {
     setError('')
     setPaying(true)
@@ -35,10 +53,12 @@ export default function PaymentPage() {
     let merchantUid
 
     try {
-      // 1. 주문 생성
       const { data: order } = await api.post('/api/orders', {
         itemId: product.id,
         quantity: 1,
+        buyerName: buyerName.trim(),
+        buyerTel: buyerTel.trim(),
+        buyerAddr: buyerAddr.trim(),
       })
       merchantUid = order.merchantUid ?? order.orderId ?? `order_${Date.now()}`
     } catch {
@@ -47,7 +67,6 @@ export default function PaymentPage() {
       return
     }
 
-    // 2. 포트원 결제창 호출
     const IMP = window.IMP
     IMP.init(IMP_CODE)
 
@@ -58,9 +77,10 @@ export default function PaymentPage() {
         merchant_uid: merchantUid,
         name: product.title,
         amount: product.price,
-        buyer_name: '',
+        buyer_name: buyerName.trim(),
         buyer_email: '',
-        buyer_tel: '',
+        buyer_tel: buyerTel.trim(),
+        buyer_addr: buyerAddr.trim(),
       },
       async (rsp) => {
         if (!rsp.success) {
@@ -69,7 +89,6 @@ export default function PaymentPage() {
           return
         }
 
-        // 3. 결제 검증
         try {
           await api.post('/api/payment/verify', {
             impUid: rsp.imp_uid,
@@ -104,6 +123,114 @@ export default function PaymentPage() {
         </div>
 
         <div className={styles.card}>
+          <h3 className={styles.sectionTitle}>구매자 정보</h3>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              이름 <span className={styles.required}>*</span>
+            </label>
+            <input
+              className={styles.input}
+              type="text"
+              placeholder="이름을 입력해주세요"
+              value={buyerName}
+              onChange={(e) => setBuyerName(e.target.value)}
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              휴대폰 번호 <span className={styles.required}>*</span>
+            </label>
+            <input
+              className={styles.input}
+              type="tel"
+              placeholder="010-0000-0000"
+              value={buyerTel}
+              onChange={(e) => setBuyerTel(e.target.value)}
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              배송지 주소 <span className={styles.required}>*</span>
+            </label>
+            <input
+              className={styles.input}
+              type="text"
+              placeholder="배송지 주소를 입력해주세요"
+              value={buyerAddr}
+              onChange={(e) => setBuyerAddr(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className={styles.card}>
+          <h3 className={styles.sectionTitle}>약관 동의</h3>
+
+          <label className={styles.allAgreeRow}>
+            <input
+              type="checkbox"
+              className={styles.checkbox}
+              checked={allAgreed}
+              onChange={handleAllAgree}
+            />
+            <span className={styles.allAgreeText}>전체 동의</span>
+          </label>
+
+          <div className={styles.divider} />
+
+          <div className={styles.agreeRow}>
+            <label className={styles.agreeLabel}>
+              <input
+                type="checkbox"
+                className={styles.checkbox}
+                checked={agreePrivacy}
+                onChange={(e) => setAgreePrivacy(e.target.checked)}
+              />
+              <span>[필수] 개인정보 수집 및 이용 동의</span>
+            </label>
+            <button
+              type="button"
+              className={styles.detailBtn}
+              onClick={() => setShowPrivacyDetail((prev) => !prev)}
+            >
+              {showPrivacyDetail ? '닫기' : '상세보기'}
+            </button>
+          </div>
+
+          {showPrivacyDetail && (
+            <div className={styles.privacyDetail}>
+              <ul className={styles.privacyList}>
+                <li><strong>수집 항목:</strong> 이름, 휴대폰 번호, 배송지 주소</li>
+                <li><strong>수집 목적:</strong> 상품 배송 및 구매 확인</li>
+                <li><strong>보유 기간:</strong> 구매일로부터 5년 (전자상거래법 기준)</li>
+              </ul>
+              <p className={styles.privacyNote}>
+                위 개인정보 수집에 동의하지 않으실 경우 구매가 제한될 수 있습니다.
+              </p>
+            </div>
+          )}
+
+          <div className={styles.agreeRow}>
+            <label className={styles.agreeLabel}>
+              <input
+                type="checkbox"
+                className={styles.checkbox}
+                checked={agreeTerms}
+                onChange={(e) => setAgreeTerms(e.target.checked)}
+              />
+              <span>[필수] 결제 서비스 이용약관 동의</span>
+            </label>
+            <a
+              href="https://portone.io/korea/ko/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.detailBtn}
+            >
+              상세보기
+            </a>
+          </div>
+        </div>
+
+        <div className={styles.card}>
           <h3 className={styles.sectionTitle}>결제 금액</h3>
           <div className={styles.totalRow}>
             <span>총 결제 금액</span>
@@ -116,7 +243,7 @@ export default function PaymentPage() {
         <button
           className={styles.payBtn}
           onClick={handlePayment}
-          disabled={paying}
+          disabled={!canPay}
         >
           {paying ? '결제 처리 중...' : `${product.price?.toLocaleString()}원 결제하기`}
         </button>

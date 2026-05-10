@@ -71,6 +71,137 @@
   color: #1a1a1a;
 }
 
+/* 구매자 정보 폼 */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.formGroup:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #444;
+}
+
+.required {
+  color: #e03131;
+}
+
+.input {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 14px;
+  color: #1a1a1a;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input::placeholder {
+  color: #bbb;
+}
+
+.input:focus {
+  border-color: #1a1a1a;
+}
+
+/* 약관 동의 */
+.allAgreeRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  margin-bottom: 14px;
+}
+
+.allAgreeText {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #f0f0f0;
+  margin-bottom: 12px;
+}
+
+.agreeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.agreeLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #333;
+  cursor: pointer;
+  flex: 1;
+}
+
+.checkbox {
+  width: 17px;
+  height: 17px;
+  accent-color: #1a1a1a;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.detailBtn {
+  font-size: 12px;
+  color: #888;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  white-space: nowrap;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.detailBtn:hover {
+  color: #444;
+}
+
+.privacyDetail {
+  background: #f8f8f8;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin: 4px 0 12px;
+}
+
+.privacyList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.privacyNote {
+  font-size: 11px;
+  color: #e03131;
+  margin: 0;
+}
+
+/* 에러 메시지 */
 .errorMsg {
   font-size: 13px;
   color: #e03131;
@@ -80,6 +211,7 @@
   padding: 10px 14px;
 }
 
+/* 버튼 */
 .payBtn {
   background: #1a1a1a;
   color: #fff;
@@ -90,7 +222,7 @@
   font-weight: 700;
   cursor: pointer;
   margin-top: 6px;
-  transition: background 0.15s;
+  transition: background 0.15s, opacity 0.15s;
 }
 
 .payBtn:hover:not(:disabled) {
@@ -99,6 +231,7 @@
 
 .payBtn:disabled {
   background: #ccc;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
