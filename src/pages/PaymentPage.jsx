@@ -17,6 +17,7 @@ export default function PaymentPage() {
   const [buyerName, setBuyerName] = useState('')
   const [buyerTel, setBuyerTel] = useState('')
   const [buyerAddr, setBuyerAddr] = useState('')
+  const [buyerAddrDetail, setBuyerAddrDetail] = useState('')
   const [agreePrivacy, setAgreePrivacy] = useState(false)
   const [agreeTerms, setAgreeTerms] = useState(false)
   const [showPrivacyDetail, setShowPrivacyDetail] = useState(false)
@@ -43,8 +44,19 @@ export default function PaymentPage() {
     setAgreeTerms(checked)
   }
 
+  const fullAddr = buyerAddr + (buyerAddrDetail.trim() ? ' ' + buyerAddrDetail.trim() : '')
+
+  const handleAddrSearch = () => {
+    new window.daum.Postcode({
+      oncomplete: (data) => {
+        setBuyerAddr(data.address)
+        setBuyerAddrDetail('')
+      },
+    }).open()
+  }
+
   const canPay =
-    buyerName.trim() && buyerTel.trim() && buyerAddr.trim() && agreePrivacy && agreeTerms && !paying
+    buyerName.trim() && buyerTel.trim() && buyerAddr && agreePrivacy && agreeTerms && !paying
 
   const handlePayment = async () => {
     setError('')
@@ -58,7 +70,7 @@ export default function PaymentPage() {
         quantity: 1,
         buyerName: buyerName.trim(),
         buyerTel: buyerTel.trim(),
-        buyerAddr: buyerAddr.trim(),
+        buyerAddr: fullAddr,
       })
       merchantUid = order.merchantUid ?? order.orderId ?? `order_${Date.now()}`
     } catch {
@@ -80,7 +92,7 @@ export default function PaymentPage() {
         buyer_name: buyerName.trim(),
         buyer_email: '',
         buyer_tel: buyerTel.trim(),
-        buyer_addr: buyerAddr.trim(),
+        buyer_addr: fullAddr,
       },
       async (rsp) => {
         if (!rsp.success) {
@@ -152,12 +164,24 @@ export default function PaymentPage() {
             <label className={styles.label}>
               배송지 주소 <span className={styles.required}>*</span>
             </label>
+            <div className={styles.addrRow}>
+              <input
+                className={styles.input}
+                type="text"
+                placeholder="주소 검색 후 자동 입력됩니다"
+                value={buyerAddr}
+                readOnly
+              />
+              <button type="button" className={styles.addrSearchBtn} onClick={handleAddrSearch}>
+                주소 검색
+              </button>
+            </div>
             <input
               className={styles.input}
               type="text"
-              placeholder="배송지 주소를 입력해주세요"
-              value={buyerAddr}
-              onChange={(e) => setBuyerAddr(e.target.value)}
+              placeholder="상세 주소 입력 (동/호수 등)"
+              value={buyerAddrDetail}
+              onChange={(e) => setBuyerAddrDetail(e.target.value)}
             />
           </div>
         </div>
