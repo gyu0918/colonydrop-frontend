@@ -1,22 +1,25 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import api from '../utils/api'
 import Navbar from '../components/Navbar'
 import styles from './OrderHistoryPage.module.css'
 
 const STATUS_LABEL = {
-  PENDING:   { text: '결제 대기',  cls: 'pending'   },
-  PAID:      { text: '결제 완료',  cls: 'paid'      },
-  REFUNDED:  { text: '환불 완료',  cls: 'refunded'  },
-  CANCELLED: { text: '취소됨',    cls: 'cancelled' },
+  PENDING:            { text: '결제 대기',  cls: 'pending'   },
+  PAID:               { text: '결제 완료',  cls: 'paid'      },
+  REFUNDED:           { text: '환불 완료',  cls: 'refunded'  },
+  PARTIALLY_REFUNDED: { text: '부분 환불',  cls: 'refunded'  },
+  CANCELLED:          { text: '취소됨',    cls: 'cancelled' },
 }
 
 export default function OrderHistoryPage() {
+  const navigate = useNavigate()
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    api.get('/api/orders')
+    api.get('/api/orders/my')
       .then((res) => {
         const d = res.data
         const list = Array.isArray(d) ? d
@@ -54,13 +57,20 @@ export default function OrderHistoryPage() {
           {orders.map((order) => {
             const statusInfo = STATUS_LABEL[order.status] ?? { text: order.status, cls: 'pending' }
             return (
-              <div key={order.id ?? order.merchantUid} className={styles.card}>
+              <div
+                key={order.merchantUid}
+                className={styles.card}
+                onClick={() => navigate(`/orders/${order.merchantUid}`)}
+              >
                 <div className={styles.top}>
-                  <div>
-                    <p className={styles.productName}>{order.productName ?? '상품 정보 없음'}</p>
-                    <p className={styles.orderId}>
-                      주문번호: {order.merchantUid ?? order.id}
-                    </p>
+                  <div className={styles.topLeft}>
+                    {order.itemImgUrl && (
+                      <img src={order.itemImgUrl} alt={order.itemTitle} className={styles.thumb} />
+                    )}
+                    <div>
+                      <p className={styles.productName}>{order.itemTitle ?? '상품 정보 없음'}</p>
+                      <p className={styles.orderId}>주문번호: {order.merchantUid}</p>
+                    </div>
                   </div>
                   <span className={`${styles.badge} ${styles[statusInfo.cls]}`}>
                     {statusInfo.text}
@@ -68,7 +78,7 @@ export default function OrderHistoryPage() {
                 </div>
                 <div className={styles.bottom}>
                   <span className={styles.amount}>
-                    {order.amount?.toLocaleString()}원
+                    {order.totalPrice?.toLocaleString()}원
                   </span>
                   <span className={styles.date}>{formatDate(order.createdAt)}</span>
                 </div>

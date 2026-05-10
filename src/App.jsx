@@ -6,6 +6,7 @@ import ProductListPage from './pages/ProductListPage'
 import ProductDetailPage from './pages/ProductDetailPage'
 import PaymentPage from './pages/PaymentPage'
 import OrderHistoryPage from './pages/OrderHistoryPage'
+import OrderDetailPage from './pages/OrderDetailPage'
 
 function PrivateRoute({ children }) {
   const { token } = useAuth()
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/products/:id" element={<ProductDetailPage />} />
           <Route path="/payment" element={<PrivateRoute><PaymentPage /></PrivateRoute>} />
           <Route path="/orders" element={<PrivateRoute><OrderHistoryPage /></PrivateRoute>} />
+          <Route path="/orders/:merchantUid" element={<PrivateRoute><OrderDetailPage /></PrivateRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
