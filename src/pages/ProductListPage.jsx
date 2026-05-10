@@ -48,7 +48,7 @@ export default function ProductListPage() {
               <div
                 key={product.id}
                 className={`${styles.card} ${isSoldOut ? styles.soldOutCard : ''}`}
-                onClick={isSoldOut ? undefined : () => navigate(`/products/${product.id}`)}
+                onClick={() => navigate(`/products/${product.id}`)}
               >
                 {product.imgUrl && (
                   <div className={styles.imageWrapper}>

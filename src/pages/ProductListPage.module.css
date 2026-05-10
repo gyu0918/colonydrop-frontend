@@ -53,7 +53,7 @@
 }
 
 .soldOutCard {
-  cursor: not-allowed;
+  cursor: pointer;
 }
 
 /* 이미지 */

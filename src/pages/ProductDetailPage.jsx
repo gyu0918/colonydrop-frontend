@@ -40,33 +40,48 @@ export default function ProductDetailPage() {
         {loading && <p className={styles.status}>불러오는 중...</p>}
         {error && <p className={styles.errorMsg}>{error}</p>}
 
-        {product && (
-          <div className={styles.detail}>
-            {product.imgUrl && (
-              <img src={product.imgUrl} alt={product.title} className={styles.image} />
-            )}
-            <div className={styles.info}>
-              <h2 className={styles.name}>{product.title}</h2>
-              <p className={styles.price}>{product.price?.toLocaleString()}원</p>
-              {product.description && (
-                <p className={styles.desc}>{product.description}</p>
+        {product && (() => {
+          const isSoldOut = product.status !== 'SALE'
+          return (
+            <div className={styles.detail}>
+              {product.imgUrl && (
+                <div className={styles.imageWrapper}>
+                  <img
+                    src={product.imgUrl}
+                    alt={product.title}
+                    className={`${styles.image} ${isSoldOut ? styles.imageSoldOut : ''}`}
+                  />
+                  {isSoldOut && <div className={styles.soldOutOverlay}>품절</div>}
+                </div>
               )}
-              <div className={styles.stock}>
-                {product.status === 'SALE'
-                  ? <span className={styles.inStock}>구매 가능</span>
-                  : <span className={styles.soldOut}>품절</span>
-                }
+              <div className={styles.info}>
+                <div className={styles.nameRow}>
+                  <h2 className={styles.name}>{product.title}</h2>
+                  {isSoldOut && <span className={styles.soldOutBadge}>품절</span>}
+                </div>
+                <p className={`${styles.price} ${isSoldOut ? styles.priceSoldOut : ''}`}>
+                  {product.price?.toLocaleString()}원
+                </p>
+                {product.description && (
+                  <p className={styles.desc}>{product.description}</p>
+                )}
+                <div className={styles.stock}>
+                  {isSoldOut
+                    ? <span className={styles.soldOut}>현재 구매 불가</span>
+                    : <span className={styles.inStock}>구매 가능</span>
+                  }
+                </div>
+                <button
+                  className={styles.buyBtn}
+                  onClick={handleBuy}
+                  disabled={isSoldOut}
+                >
+                  {isSoldOut ? '현재 구매 불가' : token ? '구매하기' : '로그인 후 구매하기'}
+                </button>
               </div>
-              <button
-                className={styles.buyBtn}
-                onClick={handleBuy}
-                disabled={product.status === 'SOLD'}
-              >
-                {product.status === 'SOLD' ? '품절' : token ? '구매하기' : '로그인 후 구매하기'}
-              </button>
             </div>
-          </div>
-        )}
+          )
+        })()}
       </main>
     </>
   )
