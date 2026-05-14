@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import SockJS from 'sockjs-client'
 import { Client } from '@stomp/stompjs'
@@ -24,16 +24,11 @@ export default function PaymentPage() {
   const [agreeTerms, setAgreeTerms] = useState(false)
   const [showPrivacyDetail, setShowPrivacyDetail] = useState(false)
 
+  // 대기열 상태
   const [waiting, setWaiting] = useState(false)
   const [waitMessage, setWaitMessage] = useState('')
   const [queuePosition, setQueuePosition] = useState(null)
   const stompClientRef = useRef(null)
-
-  useEffect(() => {
-    return () => {
-      stompClientRef.current?.deactivate()
-    }
-  }, [])
 
   if (!product) {
     return (
@@ -69,140 +64,176 @@ export default function PaymentPage() {
   }
 
   const canPay =
-    buyerName.trim() && buyerTel.trim() && buyerAddr && agreePrivacy && agreeTerms && !paying
+    buyerName.trim() && buyerTel.trim() && buyerAddr && agreePrivacy && agreeTerms && !paying && !waiting
+
+  // WebSocket 메시지 처리
+  const handleQueueMessage = (msg, client) => {
+    switch (msg.status) {
+      case 'WAITING':
+        // 3명 이상일 때만 순번 표시
+        if (msg.queuePosition >= 3) {
+          setQueuePosition(msg.queuePosition)
+          setWaitMessage(`현재 ${msg.queuePosition}번째 대기 중입니다.`)
+        } else {
+          setQueuePosition(null)
+          setWaitMessage('잠시만 기다려 주세요...')
+        }
+        break
+
+      case 'PROCESSING':
+        setQueuePosition(null)
+        setWaitMessage('결제 처리 중입니다...')
+        break
+
+      case 'READY': {
+        client.deactivate()
+        stompClientRef.current = null
+        setWaiting(false)
+        setWaitMessage('')
+
+        const merchantUid = msg.merchantUid
+
+        const IMP = window.IMP
+        IMP.init(IMP_CODE)
+
+        IMP.request_pay(
+          {
+            pg: 'html5_inicis.INIpayTest',
+            pay_method: 'card',
+            merchant_uid: merchantUid,
+            name: product.title,
+            amount: product.price,
+            buyer_name: buyerName.trim(),
+            buyer_email: '',
+            buyer_tel: buyerTel.trim(),
+            buyer_addr: fullAddr,
+          },
+          async (rsp) => {
+            if (!rsp.success) {
+              try {
+                await api.post('/api/orders/cancel', { merchantUid })
+              } catch (e) {
+                console.error('주문 취소 실패', e)
+              }
+              setError(rsp.error_msg ?? '결제가 취소되었습니다.')
+              setPaying(false)
+              return
+            }
+
+            try {
+              await api.post('/api/payment/verify', {
+                impUid: rsp.imp_uid,
+                merchantUid: rsp.merchant_uid,
+              })
+              navigate('/orders')
+            } catch {
+              setError('결제 검증에 실패했습니다. 고객센터에 문의해주세요.')
+              setPaying(false)
+            }
+          }
+        )
+        break
+      }
+
+      case 'SOLD_OUT':
+        client.deactivate()
+        stompClientRef.current = null
+        setWaiting(false)
+        setWaitMessage('')
+        setPaying(false)
+        setError('품절되었습니다.')
+        break
+
+      default:
+        break
+    }
+  }
 
   const handlePayment = async () => {
     setError('')
     setPaying(true)
+    setWaiting(true)
+    setWaitMessage('잠시만 기다려 주세요...')
 
     let sessionId
 
     try {
-      const { data: order } = await api.post('/api/orders', {
+      const { data } = await api.post('/api/orders', {
         itemId: product.id,
         quantity: 1,
         buyerName: buyerName.trim(),
         buyerTel: buyerTel.trim(),
         buyerAddr: fullAddr,
       })
-      sessionId = order.sessionId
+      sessionId = data.sessionId
     } catch {
-      setError('주문 생성에 실패했습니다.')
+      setError('주문 요청에 실패했습니다.')
       setPaying(false)
+      setWaiting(false)
       return
     }
 
-    setWaiting(true)
-    setWaitMessage('잠시만 기다려 주세요...')
-
-    const handleQueueMessage = (data) => {
-      switch (data.status) {
-        case 'WAITING':
-          if (data.queuePosition >= 3) {
-            setQueuePosition(data.queuePosition)
-            setWaitMessage(`현재 ${data.queuePosition}번째 대기 중입니다.`)
-          } else {
-            setQueuePosition(null)
-            setWaitMessage('잠시만 기다려 주세요...')
-          }
-          break
-
-        case 'PROCESSING':
-          setQueuePosition(null)
-          setWaitMessage('결제 처리 중입니다...')
-          break
-
-        case 'READY': {
-          stompClientRef.current?.deactivate()
-
-          const IMP = window.IMP
-          IMP.init(IMP_CODE)
-
-          IMP.request_pay(
-            {
-              pg: 'html5_inicis.INIpayTest',
-              pay_method: 'card',
-              merchant_uid: data.merchantUid,
-              name: product.title,
-              amount: product.price,
-              buyer_name: buyerName.trim(),
-              buyer_email: '',
-              buyer_tel: buyerTel.trim(),
-              buyer_addr: fullAddr,
-            },
-            async (rsp) => {
-              if (!rsp.success) {
-                try {
-                  await api.post('/api/orders/cancel', { merchantUid: data.merchantUid })
-                } catch {}
-                setError(rsp.error_msg ?? '결제가 취소되었습니다.')
-                setWaiting(false)
-                setPaying(false)
-                return
-              }
-
-              try {
-                await api.post('/api/payment/verify', {
-                  impUid: rsp.imp_uid,
-                  merchantUid: rsp.merchant_uid,
-                })
-                navigate('/orders')
-              } catch {
-                setError('결제 검증에 실패했습니다. 고객센터에 문의해주세요.')
-                setWaiting(false)
-                setPaying(false)
-              }
-            }
-          )
-          break
-        }
-
-        case 'SOLD_OUT':
-          stompClientRef.current?.deactivate()
-          setWaiting(false)
-          setPaying(false)
-          alert('품절되었습니다.')
-          break
-      }
-    }
-
-    const socket = new SockJS(import.meta.env.VITE_API_BASE_URL + '/ws')
-    const client = new Client({
-      webSocketFactory: () => socket,
-      onConnect: () => {
-        client.subscribe(`/queue/order/${sessionId}`, (message) => {
-          const data = JSON.parse(message.body)
-          handleQueueMessage(data)
+    // WebSocket 연결
+    try {
+      await new Promise((resolve, reject) => {
+        const socket = new SockJS('https://api.colonydrop0079.com/ws')
+        const client = new Client({
+          webSocketFactory: () => socket,
+          onConnect: () => {
+            client.subscribe(`/queue/order/${sessionId}`, (frame) => {
+              const msg = JSON.parse(frame.body)
+              handleQueueMessage(msg, client)
+            })
+            resolve()
+          },
+          onStompError: (frame) => {
+            console.error('STOMP 오류', frame)
+            reject(new Error('WebSocket 연결 실패'))
+          },
+          reconnectDelay: 3000,
         })
-      },
-      onStompError: () => {
-        setError('서버 연결에 실패했습니다.')
-        setWaiting(false)
-        setPaying(false)
-      },
-    })
-    stompClientRef.current = client
-    client.activate()
+        stompClientRef.current = client
+        client.activate()
+      })
+    } catch {
+      setError('실시간 연결에 실패했습니다. 다시 시도해주세요.')
+      setPaying(false)
+      setWaiting(false)
+    }
   }
 
   return (
     <>
       <Navbar />
-
-      {waiting && (
-        <div className={styles.waitOverlay}>
-          <div className={styles.spinner} />
-          {queuePosition !== null && (
-            <>
-              <p className={styles.queuePosition}>{queuePosition}</p>
-              <p className={styles.queueLabel}>번째 대기 중</p>
-            </>
-          )}
-          <p className={styles.waitMessage}>{waitMessage}</p>
-        </div>
-      )}
-
       <main className={styles.main}>
+
+        {/* 대기 오버레이 */}
+        {waiting && (
+          <div style={{
+            position: 'fixed', inset: 0,
+            background: 'rgba(0,0,0,0.8)',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            zIndex: 9999, color: '#fff',
+            fontFamily: 'inherit', gap: '20px',
+          }}>
+            <div style={{
+              width: 48, height: 48,
+              border: '4px solid #333',
+              borderTop: '4px solid #fff',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+            }} />
+            {queuePosition && (
+              <p style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>
+                {queuePosition}번째 대기 중
+              </p>
+            )}
+            <p style={{ fontSize: 16, color: '#aaa', margin: 0 }}>{waitMessage}</p>
+            <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+          </div>
+        )}
+
         <h2 className={styles.heading}>결제</h2>
 
         <div className={styles.card}>
@@ -353,7 +384,7 @@ export default function PaymentPage() {
           onClick={handlePayment}
           disabled={!canPay}
         >
-          {paying ? '결제 처리 중...' : `${product.price?.toLocaleString()}원 결제하기`}
+          {paying ? '처리 중...' : `${product.price?.toLocaleString()}원 결제하기`}
         </button>
 
         <button className={styles.cancelBtn} onClick={() => navigate(-1)}>
