@@ -155,25 +155,9 @@ export default function PaymentPage() {
     setWaiting(true)
     setWaitMessage('잠시만 기다려 주세요...')
 
-    let sessionId
+    const sessionId = crypto.randomUUID()
 
-    try {
-      const { data } = await api.post('/api/orders', {
-        itemId: product.id,
-        quantity: 1,
-        buyerName: buyerName.trim(),
-        buyerTel: buyerTel.trim(),
-        buyerAddr: fullAddr,
-      })
-      sessionId = data.sessionId
-    } catch {
-      setError('주문 요청에 실패했습니다.')
-      setPaying(false)
-      setWaiting(false)
-      return
-    }
-
-    // WebSocket 연결
+    // WebSocket 먼저 연결
     try {
       await new Promise((resolve, reject) => {
         const socket = new SockJS('https://api.colonydrop0079.com/ws')
@@ -186,8 +170,7 @@ export default function PaymentPage() {
             })
             resolve()
           },
-          onStompError: (frame) => {
-            console.error('STOMP 오류', frame)
+          onStompError: () => {
             reject(new Error('WebSocket 연결 실패'))
           },
           reconnectDelay: 3000,
@@ -196,7 +179,24 @@ export default function PaymentPage() {
         client.activate()
       })
     } catch {
-      setError('실시간 연결에 실패했습니다. 다시 시도해주세요.')
+      setError('실시간 연결에 실패했습니다.')
+      setPaying(false)
+      setWaiting(false)
+      return
+    }
+
+    // WebSocket 연결 완료 후 주문 생성
+    try {
+      await api.post('/api/orders', {
+        itemId: product.id,
+        quantity: 1,
+        buyerName: buyerName.trim(),
+        buyerTel: buyerTel.trim(),
+        buyerAddr: fullAddr,
+        sessionId: sessionId,
+      })
+    } catch {
+      setError('주문 요청에 실패했습니다.')
       setPaying(false)
       setWaiting(false)
     }
