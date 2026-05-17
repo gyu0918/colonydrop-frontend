@@ -23,7 +23,7 @@ export default function HomePage() {
 
           <div className={styles.heroInner}>
             <h1 className={styles.heroTitle}>COLONYDROP<br />0079</h1>
-            <p className={styles.heroDesc}>1차 판매 기간 <br/>5월 17일 오후 9:00</p>
+            <p className={styles.heroDesc}>1차 판매 기간<br/>5월 24일 오후 9:00</p>
             <button className={styles.heroCta} onClick={() => navigate('/products')}>
               전체 상품 보기
             </button>
