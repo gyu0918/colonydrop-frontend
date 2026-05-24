@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { ChatProvider } from './context/ChatContext'
+import ChatSidebar from './components/ChatSidebar'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import ProductListPage from './pages/ProductListPage'
@@ -21,20 +23,23 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/products" element={<ProductListPage />} />
-          <Route path="/products/:id" element={<ProductDetailPage />} />
-          <Route path="/payment" element={<PrivateRoute><PaymentPage /></PrivateRoute>} />
-          <Route path="/orders" element={<PrivateRoute><OrderHistoryPage /></PrivateRoute>} />
-          <Route path="/orders/:merchantUid" element={<PrivateRoute><OrderDetailPage /></PrivateRoute>} />
-          <Route path="/terms" element={<TermsPage />} />
-          <Route path="/privacy" element={<PrivacyPage />} />
-          <Route path="/refund" element={<RefundPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-        <Footer />
+        <ChatProvider>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/products" element={<ProductListPage />} />
+            <Route path="/products/:id" element={<ProductDetailPage />} />
+            <Route path="/payment" element={<PrivateRoute><PaymentPage /></PrivateRoute>} />
+            <Route path="/orders" element={<PrivateRoute><OrderHistoryPage /></PrivateRoute>} />
+            <Route path="/orders/:merchantUid" element={<PrivateRoute><OrderDetailPage /></PrivateRoute>} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/refund" element={<RefundPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+          <Footer />
+          <ChatSidebar />
+        </ChatProvider>
       </BrowserRouter>
     </AuthProvider>
   )

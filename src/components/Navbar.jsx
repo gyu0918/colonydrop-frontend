@@ -11,6 +11,7 @@ export default function Navbar() {
     logout()
     navigate('/')
   }
+  //////테스트용
 
   return (
     <nav className={styles.nav}>
