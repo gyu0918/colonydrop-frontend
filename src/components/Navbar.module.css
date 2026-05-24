@@ -1,24 +1,42 @@
 .nav {
-  background: linear-gradient(to right, #fff calc(100% - 300px), #f7f7f7 calc(100% - 300px));
   position: sticky;
   top: 0;
   z-index: 300;
+  display: flex;
+  align-items: stretch;
+  height: 60px;
 }
 
-.inner {
-  width: 100%;
-  padding: 0 24px;
-  height: 60px;
+/* 메인 콘텐츠 영역 (채팅창 제외) */
+.mainSection {
+  flex: 1;
   display: flex;
   align-items: center;
+  padding: 0 24px;
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+/* 채팅창 위 영역 (300px) */
+.chatSection {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 16px;
+  gap: 10px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  border-left: 1px solid #e0e0e0;
 }
 
 .logo {
-  flex: 1;
   font-size: 18px;
   font-weight: 900;
   color: #1a1a1a;
   letter-spacing: 1px;
+  white-space: nowrap;
 }
 
 .links {
@@ -39,18 +57,14 @@
   color: #1a1a1a;
 }
 
-.right {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 14px;
-}
-
 .nickname {
   font-size: 13px;
   font-weight: 600;
   color: #1a1a1a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 120px;
 }
 
 .loginBtn {
