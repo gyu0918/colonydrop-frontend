@@ -29,7 +29,6 @@
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
-  border-bottom: 1px solid #e8e8e8;
   flex-shrink: 0;
   background: #fff;
 }

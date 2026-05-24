@@ -1,17 +1,9 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import styles from './Navbar.module.css'
 
 export default function Navbar() {
-  const { token, logout, nickname } = useAuth()
-  const navigate = useNavigate()
-  const location = useLocation()
-
-  const handleLogout = () => {
-    logout()
-    navigate('/')
-  }
-  //////테스트용
+  const { token } = useAuth()
 
   return (
     <nav className={styles.nav}>
@@ -23,18 +15,7 @@ export default function Navbar() {
           {token && <Link to="/orders" className={styles.link}>주문 내역</Link>}
         </div>
 
-        <div className={styles.right}>
-          {token ? (
-            <>
-              <span className={styles.nickname}>{nickname ?? '회원'}님</span>
-              <button className={styles.logoutBtn} onClick={handleLogout}>로그아웃</button>
-            </>
-          ) : (
-            <button className={styles.loginBtn} onClick={() => navigate('/login', { state: { from: location.pathname } })}>
-              로그인
-            </button>
-          )}
-        </div>
+        <div className={styles.right} />
       </div>
     </nav>
   )
