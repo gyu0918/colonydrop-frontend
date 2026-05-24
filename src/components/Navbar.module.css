@@ -15,6 +15,7 @@
   padding: 0 24px;
   background: #fff;
   border-bottom: 1px solid #e8e8e8;
+  position: relative;
 }
 
 /* 채팅창 위 영역 (300px) */
@@ -39,9 +40,11 @@
 }
 
 .links {
-  flex: 1;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  justify-content: center;
+  align-items: center;
   gap: 32px;
 }
 
