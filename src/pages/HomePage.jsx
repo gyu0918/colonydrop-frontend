@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom'
-import Navbar from '../components/Navbar'
 import styles from './HomePage.module.css'
 
 export default function HomePage() {
@@ -7,7 +6,7 @@ export default function HomePage() {
 
   return (
     <>
-      <Navbar />
+
       <main>
         <section className={styles.hero}>
           {/* 배경 동영상 - public/hero.mp4 파일을 넣으면 자동 재생됩니다 */}

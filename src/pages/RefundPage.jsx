@@ -1,10 +1,9 @@
-import Navbar from '../components/Navbar'
 import styles from './RefundPage.module.css'
 
 export default function RefundPage() {
   return (
     <>
-      <Navbar />
+
       <main className={styles.main}>
         <div className={styles.container}>
           <h1 className={styles.title}>환불 정책</h1>

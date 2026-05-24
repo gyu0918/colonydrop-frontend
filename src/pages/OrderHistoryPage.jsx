@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../utils/api'
-import Navbar from '../components/Navbar'
 import styles from './OrderHistoryPage.module.css'
 
 const STATUS_LABEL = {
@@ -42,7 +41,7 @@ export default function OrderHistoryPage() {
 
   return (
     <>
-      <Navbar />
+
       <main className={styles.main}>
         <h2 className={styles.heading}>주문 내역</h2>
 

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../utils/api'
-import Navbar from '../components/Navbar'
 import styles from './ProductListPage.module.css'
 
 export default function ProductListPage() {
@@ -30,7 +29,7 @@ export default function ProductListPage() {
 
   return (
     <>
-      <Navbar />
+
       <main className={styles.main}>
         <h2 className={styles.heading}>상품 목록</h2>
 

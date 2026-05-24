@@ -1,10 +1,9 @@
-import Navbar from '../components/Navbar'
 import styles from './TermsPage.module.css'
 
 export default function TermsPage() {
   return (
     <>
-      <Navbar />
+
       <main className={styles.main}>
         <div className={styles.container}>
           <h1 className={styles.title}>이용약관</h1>

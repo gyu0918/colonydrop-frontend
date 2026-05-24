@@ -1,10 +1,9 @@
-import Navbar from '../components/Navbar'
 import styles from './PrivacyPage.module.css'
 
 export default function PrivacyPage() {
   return (
     <>
-      <Navbar />
+
       <main className={styles.main}>
         <div className={styles.container}>
           <h1 className={styles.title}>개인정보처리방침</h1>

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ChatProvider } from './context/ChatContext'
 import ChatSidebar from './components/ChatSidebar'
+import Navbar from './components/Navbar'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import ProductListPage from './pages/ProductListPage'
@@ -24,6 +25,7 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <ChatProvider>
+          <Navbar />
           <div style={{ marginRight: '300px' }}>
             <Routes>
               <Route path="/" element={<HomePage />} />

@@ -1,5 +1,5 @@
 .nav {
-  background: #fff;
+  background: linear-gradient(to right, #fff calc(100% - 300px), #f7f7f7 calc(100% - 300px));
   position: sticky;
   top: 0;
   z-index: 300;

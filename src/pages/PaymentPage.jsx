@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import SockJS from 'sockjs-client'
 import { Client } from '@stomp/stompjs'
 import api from '../utils/api'
-import Navbar from '../components/Navbar'
 import styles from './PaymentPage.module.css'
 
 const IMP_CODE = 'imp42571221'
@@ -33,7 +32,7 @@ export default function PaymentPage() {
   if (!product) {
     return (
       <>
-        <Navbar />
+  
         <main className={styles.main}>
           <p className={styles.errorMsg}>상품 정보가 없습니다.</p>
           <button className={styles.backBtn} onClick={() => navigate('/products')}>
@@ -204,7 +203,7 @@ export default function PaymentPage() {
 
   return (
     <>
-      <Navbar />
+
       <main className={styles.main}>
 
         {/* 대기 오버레이 */}

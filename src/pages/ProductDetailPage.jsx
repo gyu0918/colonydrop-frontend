@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../utils/api'
 import { useAuth } from '../context/AuthContext'
-import Navbar from '../components/Navbar'
 import styles from './ProductDetailPage.module.css'
 
 export default function ProductDetailPage() {
@@ -31,7 +30,7 @@ export default function ProductDetailPage() {
 
   return (
     <>
-      <Navbar />
+
       <main className={styles.main}>
         <button className={styles.back} onClick={() => navigate('/products')}>
           ← 목록으로

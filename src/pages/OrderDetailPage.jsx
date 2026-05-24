@@ -1,7 +1,6 @@
 // import { useEffect, useState } from 'react'
 // import { useParams, useNavigate } from 'react-router-dom'
 // import api from '../utils/api'
-// import Navbar from '../components/Navbar'
 // import styles from './OrderDetailPage.module.css'
 
 // const STATUS_LABEL = {
@@ -63,7 +62,7 @@
 //   if (loading) {
 //     return (
 //       <>
-//         <Navbar />
+//   
 //         <main className={styles.main}><p className={styles.status}>불러오는 중...</p></main>
 //       </>
 //     )
@@ -72,7 +71,7 @@
 //   if (error || !order) {
 //     return (
 //       <>
-//         <Navbar />
+//   
 //         <main className={styles.main}>
 //           <p className={styles.errorMsg}>{error || '주문 정보가 없습니다.'}</p>
 //           <button className={styles.backBtn} onClick={() => navigate('/orders')}>주문 내역으로</button>
@@ -85,7 +84,7 @@
 
 //   return (
 //     <>
-//       <Navbar />
+// 
 //       <main className={styles.main}>
 //         <div className={styles.pageHeader}>
 //           <button className={styles.backBtn} onClick={() => navigate('/orders')}>← 주문 내역</button>
@@ -201,7 +200,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../utils/api'
-import Navbar from '../components/Navbar'
 import styles from './OrderDetailPage.module.css'
 
 const IMP_CODE = 'imp42571221'
@@ -297,7 +295,7 @@ export default function OrderDetailPage() {
   if (loading) {
     return (
       <>
-        <Navbar />
+  
         <main className={styles.main}><p className={styles.status}>불러오는 중...</p></main>
       </>
     )
@@ -306,7 +304,7 @@ export default function OrderDetailPage() {
   if (error || !order) {
     return (
       <>
-        <Navbar />
+  
         <main className={styles.main}>
           <p className={styles.errorMsg}>{error || '주문 정보가 없습니다.'}</p>
           <button className={styles.backBtn} onClick={() => navigate('/orders')}>주문 내역으로</button>
@@ -319,7 +317,7 @@ export default function OrderDetailPage() {
 
   return (
     <>
-      <Navbar />
+
       <main className={styles.main}>
         <div className={styles.pageHeader}>
           <button className={styles.backBtn} onClick={() => navigate('/orders')}>
