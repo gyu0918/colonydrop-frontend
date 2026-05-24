@@ -1,11 +1,11 @@
 .container {
   position: fixed;
-  top: 0;
+  top: 60px;
   right: 0;
-  height: 100vh;
+  height: calc(100vh - 60px);
   display: flex;
   align-items: flex-start;
-  z-index: 200;
+  z-index: 50;
 }
 
 

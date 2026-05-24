@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useChat } from '../context/ChatContext'
 import { useAuth } from '../context/AuthContext'
 import styles from './ChatSidebar.module.css'
@@ -19,8 +18,7 @@ const formatTime = (timeStr) => {
 
 export default function ChatSidebar() {
   const { connected, currentRoom, messages, totalUsers, roomUsers, switchRoom, sendMessage, ROOMS } = useChat()
-  const { token, user, nickname, logout } = useAuth()
-  const navigate = useNavigate()
+  const { token, user } = useAuth()
   const [input, setInput] = useState('')
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
@@ -49,17 +47,6 @@ export default function ChatSidebar() {
   return (
     <div className={styles.container}>
       <div className={styles.panel}>
-        <div className={styles.topBar}>
-          {token ? (
-            <>
-              <span className={styles.topNickname}>{nickname}</span>
-              <button className={styles.topLogoutBtn} onClick={logout}>로그아웃</button>
-            </>
-          ) : (
-            <button className={styles.topLoginBtn} onClick={() => navigate('/login')}>로그인</button>
-          )}
-        </div>
-
         <div className={styles.header}>
           <span className={styles.headerTitle}>실시간 채팅</span>
           <span className={styles.onlineCount}>
