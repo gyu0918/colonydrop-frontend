@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useChat } from '../context/ChatContext'
 import { useAuth } from '../context/AuthContext'
 import styles from './ChatSidebar.module.css'
@@ -19,7 +19,6 @@ const formatTime = (timeStr) => {
 export default function ChatSidebar() {
   const { connected, currentRoom, messages, totalUsers, roomUsers, switchRoom, sendMessage, ROOMS } = useChat()
   const { token, user } = useAuth()
-  const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
@@ -28,10 +27,8 @@ export default function ChatSidebar() {
   const currentMessages = messages[currentRoom] || []
 
   useEffect(() => {
-    if (open) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }
-  }, [currentMessages.length, currentRoom, open])
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [currentMessages.length, currentRoom])
 
   const handleSend = () => {
     if (!input.trim() || !token || !connected) return
@@ -48,20 +45,7 @@ export default function ChatSidebar() {
   }
 
   return (
-    <div className={`${styles.container} ${open ? styles.open : ''}`}>
-      <button
-        className={styles.toggleBtn}
-        onClick={() => setOpen(v => !v)}
-        title={open ? '채팅 닫기' : '채팅 열기'}
-      >
-        <span className={`${styles.statusDot} ${connected ? styles.connected : ''}`} />
-        <span className={styles.toggleIcon}>{open ? '›' : '‹'}</span>
-        {!open && <span className={styles.chatLabel}>채팅</span>}
-        {!open && totalUsers > 0 && (
-          <span className={styles.userBadge}>{totalUsers}</span>
-        )}
-      </button>
-
+    <div className={styles.container}>
       <div className={styles.panel}>
         <div className={styles.header}>
           <span className={styles.headerTitle}>실시간 채팅</span>

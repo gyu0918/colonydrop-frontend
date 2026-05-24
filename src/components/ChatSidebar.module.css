@@ -8,70 +8,10 @@
   z-index: 200;
 }
 
-/* ── Toggle button ── */
-.toggleBtn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  width: 30px;
-  padding: 14px 0;
-  margin-top: 48px;
-  background: #1a1a1a;
-  color: #fff;
-  border: none;
-  border-radius: 8px 0 0 8px;
-  cursor: pointer;
-  flex-shrink: 0;
-  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.18);
-  transition: background 0.15s;
-}
-
-.toggleBtn:hover {
-  background: #333;
-}
-
-.statusDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #666;
-  flex-shrink: 0;
-}
-
-.statusDot.connected {
-  background: #22c55e;
-}
-
-.toggleIcon {
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.chatLabel {
-  font-size: 10px;
-  font-weight: 600;
-  writing-mode: vertical-rl;
-  letter-spacing: 1px;
-}
-
-.userBadge {
-  background: #22c55e;
-  color: #fff;
-  border-radius: 10px;
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 4px;
-  min-width: 16px;
-  text-align: center;
-  line-height: 1.4;
-}
 
 /* ── Panel ── */
 .panel {
-  width: 0;
+  width: 300px;
   height: 100%;
   overflow: hidden;
   display: flex;
@@ -79,11 +19,6 @@
   background: #fff;
   border-left: 1px solid #e8e8e8;
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.08);
-  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.open .panel {
-  width: 300px;
 }
 
 /* ── Header ── */
