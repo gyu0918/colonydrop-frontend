@@ -3,19 +3,6 @@ import { useChat } from '../context/ChatContext'
 import { useAuth } from '../context/AuthContext'
 import styles from './ChatSidebar.module.css'
 
-const formatTime = (timeStr) => {
-  if (!timeStr) return ''
-  try {
-    return new Date(timeStr).toLocaleTimeString('ko-KR', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    })
-  } catch {
-    return ''
-  }
-}
-
 export default function ChatSidebar() {
   const { connected, currentRoom, messages, totalUsers, roomUsers, switchRoom, sendMessage, ROOMS } = useChat()
   const { token, user } = useAuth()
@@ -83,7 +70,6 @@ export default function ChatSidebar() {
                   <div className={`${styles.bubble} ${isMe ? styles.bubbleMe : styles.bubbleOther}`}>
                     {msg.content}
                   </div>
-                  <span className={styles.time}>{formatTime(msg.time)}</span>
                 </div>
               )
             })
