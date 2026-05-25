@@ -36,7 +36,7 @@ export function ChatProvider({ children }) {
   const loadHistory = useCallback(async (roomType) => {
     try {
       const res = await api.get(`/api/chat/history/${roomType}`)
-      setMessages(prev => ({ ...prev, [roomType]: res.data || [] }))
+      setMessages(prev => ({ ...prev, [roomType]: (res.data || []).reverse() }))
     } catch (e) {
       console.error('채팅 히스토리 로드 실패', e)
     }
