@@ -102,10 +102,10 @@ export function ChatProvider({ children }) {
 
   const sendMessage = useCallback((content) => {
     if (!stompClientRef.current?.connected || !token || !user || !content.trim()) return
-    const senderId = user.memberId ?? user.sub ?? user.id ?? 'anonymous'
+    const senderName = user.memberName ?? user.name ?? user.nickname ?? user.memberId ?? 'anonymous'
     stompClientRef.current.publish({
       destination: `/app/chat/${currentRoomRef.current}`,
-      body: JSON.stringify({ senderId, content: content.trim() }),
+      body: JSON.stringify({ senderId: senderName, content: content.trim() }),
       headers: { Authorization: `Bearer ${token}` },
     })
   }, [token, user])
