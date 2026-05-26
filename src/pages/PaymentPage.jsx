@@ -89,8 +89,8 @@ export default function PaymentPage() {
 
     IMP.request_pay(
       {
-        // pg: 'html5_inicis.INIpayTest', 테스트용
-        pg: 'html5_inicis.MOI6007538',
+        pg: 'html5_inicis.INIpayTest', 
+        // pg: 'html5_inicis.MOI6007538',
         pay_method: 'card',
         merchant_uid: merchantUid,
         name: product.title,
