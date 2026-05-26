@@ -66,7 +66,6 @@ export default function PaymentPage() {
 
     const sessionId = crypto.randomUUID()
 
-    // 주문 생성
     try {
       await api.post('/api/orders', {
         itemId: product.id,
@@ -74,7 +73,7 @@ export default function PaymentPage() {
         buyerName: buyerName.trim(),
         buyerTel: buyerTel.trim(),
         buyerAddr: fullAddr,
-        sessionId: sessionId,
+        sessionId,
       })
     } catch {
       setError('주문 생성에 실패했습니다.')
@@ -83,23 +82,22 @@ export default function PaymentPage() {
       return
     }
 
-    // WebSocket 연결 후 READY/SOLD_OUT 대기
     const wsUrl = import.meta.env.VITE_API_URL + '/ws'
-    const topic = `/topic/order-status/${sessionId}`
+    const topic = `/queue/order/${sessionId}`
 
     await new Promise((resolve) => {
-      const timeoutId = setTimeout(() => {
-        client.deactivate()
-        setError('결제 요청이 시간 초과되었습니다. 다시 시도해주세요.')
-        setPaying(false)
-        setWaiting(false)
-        resolve()
-      }, 30000)
-
       const client = new Client({
         webSocketFactory: () => new SockJS(wsUrl),
         reconnectDelay: 0,
         onConnect: () => {
+          const timeoutId = setTimeout(() => {
+            client.deactivate()
+            setError('결제 요청이 시간 초과되었습니다. 다시 시도해주세요.')
+            setPaying(false)
+            setWaiting(false)
+            resolve()
+          }, 30000)
+
           client.subscribe(topic, async (frame) => {
             const msg = JSON.parse(frame.body)
 
@@ -125,7 +123,6 @@ export default function PaymentPage() {
               IMP.request_pay(
                 {
                   pg: 'html5_inicis.INIpayTest',
-                  // pg: 'html5_inicis.MOI6007538',
                   pay_method: 'card',
                   merchant_uid: merchantUid,
                   name: product.title,
@@ -165,7 +162,6 @@ export default function PaymentPage() {
           })
         },
         onStompError: () => {
-          clearTimeout(timeoutId)
           setError('실시간 연결에 실패했습니다. 다시 시도해주세요.')
           setPaying(false)
           setWaiting(false)
