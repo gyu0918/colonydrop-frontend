@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import SockJS from 'sockjs-client'
+import { Client } from '@stomp/stompjs'
 import api from '../utils/api'
 import styles from './PaymentPage.module.css'
 
@@ -11,6 +13,7 @@ export default function PaymentPage() {
   const product = location.state?.product
 
   const [paying, setPaying] = useState(false)
+  const [waiting, setWaiting] = useState(false)
   const [error, setError] = useState('')
 
   const [buyerName, setBuyerName] = useState('')
@@ -54,18 +57,18 @@ export default function PaymentPage() {
   }
 
   const canPay =
-    buyerName.trim() && buyerTel.trim() && buyerAddr && agreePrivacy && agreeTerms && !paying
+    buyerName.trim() && buyerTel.trim() && buyerAddr && agreePrivacy && agreeTerms && !paying && !waiting
 
   const handlePayment = async () => {
     setError('')
     setPaying(true)
-
-    let merchantUid
+    setWaiting(true)
 
     const sessionId = crypto.randomUUID()
 
+    // 주문 생성
     try {
-      const { data: order } = await api.post('/api/orders', {
+      await api.post('/api/orders', {
         itemId: product.id,
         quantity: 1,
         buyerName: buyerName.trim(),
@@ -73,60 +76,128 @@ export default function PaymentPage() {
         buyerAddr: fullAddr,
         sessionId: sessionId,
       })
-      merchantUid = order.merchantUid ?? order.orderId ?? `order_${Date.now()}`
     } catch {
       setError('주문 생성에 실패했습니다.')
       setPaying(false)
+      setWaiting(false)
       return
     }
 
-    const IMP = window.IMP
-    IMP.init(IMP_CODE)
+    // WebSocket 연결 후 READY/SOLD_OUT 대기
+    const wsUrl = import.meta.env.VITE_API_URL + '/ws'
+    const topic = `/topic/order-status/${sessionId}`
 
-    IMP.request_pay(
-      {
-        pg: 'html5_inicis.INIpayTest', 
-        // pg: 'html5_inicis.MOI6007538',
-        pay_method: 'card',
-        merchant_uid: merchantUid,
-        name: product.title,
-        amount: product.price,
-        buyer_name: buyerName.trim(),
-        buyer_email: '',
-        buyer_tel: buyerTel.trim(),
-        buyer_addr: fullAddr,
-      },
-      async (rsp) => {
-        if (!rsp.success) {
-           // 결제 취소 시 주문 취소 API 호출 추가
-          try {
-              await api.post('/api/orders/cancel', {
-                  merchantUid: merchantUid
-              })
-          } catch (e) {
-              console.error('주문 취소 실패', e)
-          }
-          setError(rsp.error_msg ?? '결제가 취소되었습니다.')
-          setPaying(false)
-          return
-        }
+    await new Promise((resolve) => {
+      const timeoutId = setTimeout(() => {
+        client.deactivate()
+        setError('결제 요청이 시간 초과되었습니다. 다시 시도해주세요.')
+        setPaying(false)
+        setWaiting(false)
+        resolve()
+      }, 30000)
 
-        try {
-          await api.post('/api/payment/verify', {
-            impUid: rsp.imp_uid,
-            merchantUid: rsp.merchant_uid,
+      const client = new Client({
+        webSocketFactory: () => new SockJS(wsUrl),
+        reconnectDelay: 0,
+        onConnect: () => {
+          client.subscribe(topic, async (frame) => {
+            const msg = JSON.parse(frame.body)
+
+            if (msg.status === 'SOLD_OUT') {
+              clearTimeout(timeoutId)
+              client.deactivate()
+              setError('품절되었습니다.')
+              setPaying(false)
+              setWaiting(false)
+              resolve()
+              return
+            }
+
+            if (msg.status === 'READY') {
+              clearTimeout(timeoutId)
+              client.deactivate()
+              setWaiting(false)
+
+              const merchantUid = msg.merchantUid
+              const IMP = window.IMP
+              IMP.init(IMP_CODE)
+
+              IMP.request_pay(
+                {
+                  pg: 'html5_inicis.INIpayTest',
+                  // pg: 'html5_inicis.MOI6007538',
+                  pay_method: 'card',
+                  merchant_uid: merchantUid,
+                  name: product.title,
+                  amount: product.price,
+                  buyer_name: buyerName.trim(),
+                  buyer_email: '',
+                  buyer_tel: buyerTel.trim(),
+                  buyer_addr: fullAddr,
+                },
+                async (rsp) => {
+                  if (!rsp.success) {
+                    try {
+                      await api.post('/api/orders/cancel', { merchantUid })
+                    } catch (e) {
+                      console.error('주문 취소 실패', e)
+                    }
+                    setError(rsp.error_msg ?? '결제가 취소되었습니다.')
+                    setPaying(false)
+                    resolve()
+                    return
+                  }
+
+                  try {
+                    await api.post('/api/payment/verify', {
+                      impUid: rsp.imp_uid,
+                      merchantUid: rsp.merchant_uid,
+                    })
+                    navigate('/orders')
+                  } catch {
+                    setError('결제 검증에 실패했습니다. 고객센터에 문의해주세요.')
+                    setPaying(false)
+                  }
+                  resolve()
+                }
+              )
+            }
           })
-          navigate('/orders')
-        } catch {
-          setError('결제 검증에 실패했습니다. 고객센터에 문의해주세요.')
+        },
+        onStompError: () => {
+          clearTimeout(timeoutId)
+          setError('실시간 연결에 실패했습니다. 다시 시도해주세요.')
           setPaying(false)
-        }
-      }
-    )
+          setWaiting(false)
+          resolve()
+        },
+      })
+
+      client.activate()
+    })
   }
 
   return (
     <>
+      {waiting && (
+        <div style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(0,0,0,0.7)',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          zIndex: 9999, color: '#fff', gap: 16,
+        }}>
+          <div style={{
+            width: 44, height: 44,
+            border: '4px solid #555',
+            borderTop: '4px solid #fff',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+          }} />
+          <p style={{ margin: 0, fontSize: 16 }}>결제 준비 중입니다...</p>
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      )}
       <main className={styles.main}>
         <h2 className={styles.heading}>결제</h2>
 
