@@ -63,10 +63,10 @@ export default function PaymentPage() {
     setPaying(true)
 
     let merchantUid
-    let savedSessionId
+    // let savedSessionId
 
-    const sessionId = crypto.randomUUID()
-    savedSessionId = sessionId
+    // const sessionId = crypto.randomUUID()
+    // savedSessionId = sessionId
 
     try {
       const { data: order } = await api.post('/api/orders', {
@@ -75,7 +75,7 @@ export default function PaymentPage() {
         buyerName: buyerName.trim(),
         buyerTel: buyerTel.trim(),
         buyerAddr: fullAddr,
-        sessionId: sessionId,
+        // sessionId: sessionId,
       })
       merchantUid = order.merchantUid ?? order.orderId ?? `order_${Date.now()}`
     } catch {
