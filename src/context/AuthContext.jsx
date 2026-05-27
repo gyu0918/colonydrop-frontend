@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
   const raw = user?.memberName ?? user?.nickname ?? user?.name ?? user?.memberId ?? null
   if (!raw) return null
   try {
-    return decodeURIComponent(escape(raw))
+    return decodeURIComponent(raw)
   } catch {
     return raw
   }

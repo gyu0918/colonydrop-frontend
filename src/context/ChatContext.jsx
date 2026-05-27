@@ -19,7 +19,7 @@ const INITIAL_MESSAGES = { gundam: [], openrun: [], sharing: [], free: [] }
 const INITIAL_ROOM_USERS = { gundam: 0, openrun: 0, sharing: 0, free: 0 }
 
 export function ChatProvider({ children }) {
-  const { token, user } = useAuth()
+  const { token, user, nickname } = useAuth()
   const stompClientRef = useRef(null)
   const [connected, setConnected] = useState(false)
   const [currentRoom, setCurrentRoom] = useState('free')
@@ -102,13 +102,13 @@ export function ChatProvider({ children }) {
 
   const sendMessage = useCallback((content) => {
     if (!stompClientRef.current?.connected || !token || !user || !content.trim()) return
-    const senderName = user.memberName ?? user.name ?? user.nickname ?? user.memberId ?? 'anonymous'
+    const senderName = nickname ?? user?.memberId ?? 'anonymous'
     stompClientRef.current.publish({
       destination: `/app/chat/${currentRoomRef.current}`,
       body: JSON.stringify({ senderId: senderName, content: content.trim() }),
       headers: { Authorization: `Bearer ${token}` },
     })
-  }, [token, user])
+  }, [token, user, nickname])
 
   return (
     <ChatContext.Provider value={{
