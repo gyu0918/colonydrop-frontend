@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import styles from './ChatSidebar.module.css'
 
 export default function ChatSidebar() {
-  const { connected, currentRoom, messages, totalUsers, roomUsers, switchRoom, sendMessage, ROOMS } = useChat()
+  const { connected, currentRoom, messages, switchRoom, sendMessage, ROOMS } = useChat()
   const { token, user } = useAuth()
   const [input, setInput] = useState('')
   const messagesEndRef = useRef(null)
@@ -37,10 +37,7 @@ export default function ChatSidebar() {
       <div className={styles.panel}>
         <div className={styles.header}>
           <span className={styles.headerTitle}>실시간 채팅</span>
-          <span className={styles.onlineCount}>
-            <span className={`${styles.dot} ${connected ? styles.dotOn : ''}`} />
-            {totalUsers}명 접속 중
-          </span>
+          <span className={`${styles.dot} ${connected ? styles.dotOn : ''}`} />
         </div>
 
         <div className={styles.tabs}>
@@ -51,9 +48,6 @@ export default function ChatSidebar() {
               onClick={() => switchRoom(room.id)}
             >
               {room.label}
-              {roomUsers[room.id] > 0 && (
-                <span className={styles.roomBadge}>{roomUsers[room.id]}</span>
-              )}
             </button>
           ))}
         </div>
