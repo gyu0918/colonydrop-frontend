@@ -66,6 +66,16 @@ export function ChatProvider({ children }) {
       onConnect: () => {
         setConnected(true)
 
+        api.get('/api/chat/site/users')
+          .then(res => setTotalUsers(res.data.count))
+          .catch(() => {})
+
+        ROOMS.forEach(({ id }) => {
+          api.get(`/api/chat/users/${id}`)
+            .then(res => setRoomUsers(prev => ({ ...prev, [id]: res.data.count })))
+            .catch(() => {})
+        })
+
         client.subscribe('/topic/users', (frame) => {
           try { setTotalUsers(Number(JSON.parse(frame.body))) } catch {}
         })
