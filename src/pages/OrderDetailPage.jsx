@@ -228,7 +228,7 @@ export default function OrderDetailPage() {
   const [refundSuccess, setRefundSuccess] = useState(false)
 
   const [showAddrModal, setShowAddrModal] = useState(false)
-  const [addrForm, setAddrForm] = useState({ buyerName: '', buyerTel: '', buyerAddr: '' })
+  const [addrForm, setAddrForm] = useState({ buyerName: '', buyerTel: '', buyerAddr: '', buyerAddrDetail: '' })
   const [addrSaving, setAddrSaving] = useState(false)
   const [addrError, setAddrError] = useState('')
 
@@ -268,27 +268,37 @@ export default function OrderDetailPage() {
 
   const openAddrModal = () => {
     setAddrForm({
-      buyerName: order.buyerName ?? '',
-      buyerTel:  order.buyerTel  ?? '',
-      buyerAddr: order.buyerAddr ?? '',
+      buyerName:       order.buyerName ?? '',
+      buyerTel:        order.buyerTel  ?? '',
+      buyerAddr:       order.buyerAddr ?? '',
+      buyerAddrDetail: '',
     })
     setAddrError('')
     setShowAddrModal(true)
   }
 
+  const handleAddrSearch = () => {
+    new window.daum.Postcode({
+      oncomplete: (data) => {
+        setAddrForm((prev) => ({ ...prev, buyerAddr: data.address, buyerAddrDetail: '' }))
+      },
+    }).open()
+  }
+
   const handleAddrSave = async () => {
     if (!addrForm.buyerName.trim()) { setAddrError('이름을 입력해주세요.'); return }
     if (!addrForm.buyerTel.trim())  { setAddrError('연락처를 입력해주세요.'); return }
-    if (!addrForm.buyerAddr.trim()) { setAddrError('주소를 입력해주세요.'); return }
+    if (!addrForm.buyerAddr.trim()) { setAddrError('주소를 검색해주세요.'); return }
     setAddrSaving(true)
     setAddrError('')
+    const fullAddr = addrForm.buyerAddr + (addrForm.buyerAddrDetail.trim() ? ' ' + addrForm.buyerAddrDetail.trim() : '')
     try {
       await api.patch(`/api/orders/${order.merchantUid}/address`, {
         buyerName: addrForm.buyerName.trim(),
         buyerTel:  addrForm.buyerTel.trim(),
-        buyerAddr: addrForm.buyerAddr.trim(),
+        buyerAddr: fullAddr,
       })
-      setOrder((prev) => ({ ...prev, ...addrForm }))
+      setOrder((prev) => ({ ...prev, buyerName: addrForm.buyerName.trim(), buyerTel: addrForm.buyerTel.trim(), buyerAddr: fullAddr }))
       setShowAddrModal(false)
     } catch {
       setAddrError('배송지 변경에 실패했습니다. 다시 시도해주세요.')
@@ -472,12 +482,24 @@ export default function OrderDetailPage() {
             </div>
             <div className={styles.addrField}>
               <label className={styles.addrLabel}>주소</label>
+              <div className={styles.addrRow}>
+                <input
+                  className={styles.addrInput}
+                  type="text"
+                  value={addrForm.buyerAddr}
+                  readOnly
+                  placeholder="주소 검색 후 자동 입력됩니다"
+                />
+                <button type="button" className={styles.addrSearchBtn} onClick={handleAddrSearch}>
+                  주소 검색
+                </button>
+              </div>
               <input
                 className={styles.addrInput}
                 type="text"
-                value={addrForm.buyerAddr}
-                onChange={(e) => setAddrForm((p) => ({ ...p, buyerAddr: e.target.value }))}
-                placeholder="배송받으실 주소를 입력하세요"
+                value={addrForm.buyerAddrDetail}
+                onChange={(e) => setAddrForm((p) => ({ ...p, buyerAddrDetail: e.target.value }))}
+                placeholder="상세 주소 입력 (동/호수 등)"
               />
             </div>
             {addrError && <p className={styles.modalError}>{addrError}</p>}

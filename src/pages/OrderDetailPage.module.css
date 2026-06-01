@@ -293,7 +293,35 @@
 .addrField {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
+}
+
+.addrRow {
+  display: flex;
+  gap: 8px;
+}
+
+.addrRow .addrInput {
+  flex: 1;
+}
+
+.addrSearchBtn {
+  flex-shrink: 0;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.addrSearchBtn:hover {
+  background: #f3f4f6;
 }
 
 .addrLabel {
