@@ -66,9 +66,11 @@
   font-family: inherit;
 }
 
-.pending  { background: #fef3c7; color: #d97706; border-color: #fde68a; }
-.paid     { background: #d1fae5; color: #059669; border-color: #a7f3d0; }
-.refunded { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
+.pending   { background: #fef3c7; color: #d97706; border-color: #fde68a; }
+.paid      { background: #d1fae5; color: #059669; border-color: #a7f3d0; }
+.shipping  { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+.delivered { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+.refunded  { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
 .cancelled { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
 
 .detailBtn {

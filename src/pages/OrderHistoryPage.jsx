@@ -6,6 +6,8 @@ import styles from './OrderHistoryPage.module.css'
 const STATUS_LABEL = {
   PENDING:            { text: '결제 대기',  cls: 'pending'   },
   PAID:               { text: '결제 완료',  cls: 'paid'      },
+  SHIPPING:           { text: '배송중',    cls: 'shipping'  },
+  DELIVERED:          { text: '배송 완료', cls: 'delivered' },
   REFUNDED:           { text: '환불 완료',  cls: 'refunded'  },
   PARTIALLY_REFUNDED: { text: '부분 환불',  cls: 'refunded'  },
   CANCELLED:          { text: '취소됨',    cls: 'cancelled' },

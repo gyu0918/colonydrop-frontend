@@ -100,6 +100,16 @@
   color: #2f9e44;
 }
 
+.shipping {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.delivered {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
 .refunded {
   background: #dbe4ff;
   color: #3b5bdb;

@@ -5,15 +5,18 @@ import styles from './AdminOrdersPage.module.css'
 const STATUS_LABEL = {
   PENDING:            '결제 대기',
   PAID:               '결제 완료',
+  SHIPPING:           '배송중',
+  DELIVERED:          '배송 완료',
   REFUNDED:           '환불 완료',
   PARTIALLY_REFUNDED: '부분 환불',
   CANCELLED:          '취소됨',
 }
 
-const STATUS_OPTIONS = ['PENDING', 'PAID', 'REFUNDED', 'PARTIALLY_REFUNDED', 'CANCELLED']
+const STATUS_OPTIONS = ['PENDING', 'PAID', 'SHIPPING', 'DELIVERED', 'REFUNDED', 'PARTIALLY_REFUNDED', 'CANCELLED']
 
 const STATUS_CLS = {
   PENDING: 'pending', PAID: 'paid',
+  SHIPPING: 'shipping', DELIVERED: 'delivered',
   REFUNDED: 'refunded', PARTIALLY_REFUNDED: 'refunded', CANCELLED: 'cancelled',
 }
 
