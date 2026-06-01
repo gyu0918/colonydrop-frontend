@@ -227,6 +227,11 @@ export default function OrderDetailPage() {
   const [refundError, setRefundError] = useState('')
   const [refundSuccess, setRefundSuccess] = useState(false)
 
+  const [showAddrModal, setShowAddrModal] = useState(false)
+  const [addrForm, setAddrForm] = useState({ buyerName: '', buyerTel: '', buyerAddr: '' })
+  const [addrSaving, setAddrSaving] = useState(false)
+  const [addrError, setAddrError] = useState('')
+
   useEffect(() => {
     api.get(`/api/orders/${merchantUid}`)
       .then((res) => setOrder(res.data))
@@ -258,6 +263,37 @@ export default function OrderDetailPage() {
       setRefundError('환불 처리에 실패했습니다. 고객센터에 문의해주세요.')
     } finally {
       setRefunding(false)
+    }
+  }
+
+  const openAddrModal = () => {
+    setAddrForm({
+      buyerName: order.buyerName ?? '',
+      buyerTel:  order.buyerTel  ?? '',
+      buyerAddr: order.buyerAddr ?? '',
+    })
+    setAddrError('')
+    setShowAddrModal(true)
+  }
+
+  const handleAddrSave = async () => {
+    if (!addrForm.buyerName.trim()) { setAddrError('이름을 입력해주세요.'); return }
+    if (!addrForm.buyerTel.trim())  { setAddrError('연락처를 입력해주세요.'); return }
+    if (!addrForm.buyerAddr.trim()) { setAddrError('주소를 입력해주세요.'); return }
+    setAddrSaving(true)
+    setAddrError('')
+    try {
+      await api.patch(`/api/orders/${order.merchantUid}/address`, {
+        buyerName: addrForm.buyerName.trim(),
+        buyerTel:  addrForm.buyerTel.trim(),
+        buyerAddr: addrForm.buyerAddr.trim(),
+      })
+      setOrder((prev) => ({ ...prev, ...addrForm }))
+      setShowAddrModal(false)
+    } catch {
+      setAddrError('배송지 변경에 실패했습니다. 다시 시도해주세요.')
+    } finally {
+      setAddrSaving(false)
     }
   }
 
@@ -385,6 +421,12 @@ export default function OrderDetailPage() {
         {error && <p className={styles.errorMsg}>{error}</p>}
 
         {order.status === 'PAID' && !refundSuccess && (
+          <button className={styles.addrBtn} onClick={openAddrModal}>
+            배송지 변경
+          </button>
+        )}
+
+        {order.status === 'PAID' && !refundSuccess && (
           <button
             className={styles.refundBtn}
             onClick={() => { setShowModal(true); setRefundError('') }}
@@ -403,6 +445,61 @@ export default function OrderDetailPage() {
           </button>
         )}
       </main>
+
+      {showAddrModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowAddrModal(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.modalTitle}>배송지 변경</h3>
+            <div className={styles.addrField}>
+              <label className={styles.addrLabel}>이름</label>
+              <input
+                className={styles.addrInput}
+                type="text"
+                value={addrForm.buyerName}
+                onChange={(e) => setAddrForm((p) => ({ ...p, buyerName: e.target.value }))}
+                placeholder="수령인 이름"
+              />
+            </div>
+            <div className={styles.addrField}>
+              <label className={styles.addrLabel}>연락처</label>
+              <input
+                className={styles.addrInput}
+                type="tel"
+                value={addrForm.buyerTel}
+                onChange={(e) => setAddrForm((p) => ({ ...p, buyerTel: e.target.value }))}
+                placeholder="010-0000-0000"
+              />
+            </div>
+            <div className={styles.addrField}>
+              <label className={styles.addrLabel}>주소</label>
+              <input
+                className={styles.addrInput}
+                type="text"
+                value={addrForm.buyerAddr}
+                onChange={(e) => setAddrForm((p) => ({ ...p, buyerAddr: e.target.value }))}
+                placeholder="배송받으실 주소를 입력하세요"
+              />
+            </div>
+            {addrError && <p className={styles.modalError}>{addrError}</p>}
+            <div className={styles.modalActions}>
+              <button
+                className={styles.modalCancelBtn}
+                onClick={() => setShowAddrModal(false)}
+                disabled={addrSaving}
+              >
+                취소
+              </button>
+              <button
+                className={styles.addrConfirmBtn}
+                onClick={handleAddrSave}
+                disabled={addrSaving}
+              >
+                {addrSaving ? '저장 중...' : '변경 완료'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showModal && (
         <div className={styles.modalOverlay} onClick={() => setShowModal(false)}>
