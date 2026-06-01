@@ -104,7 +104,7 @@ export default function PaymentPage() {
             if (msg.status === 'SOLD_OUT') {
               clearTimeout(timeoutId)
               client.deactivate()
-              setError('품절되었습니다.')
+              setError(msg.message ?? '품절되었습니다.')  // ← msg.message로 변경
               setPaying(false)
               setWaiting(false)
               resolve()
