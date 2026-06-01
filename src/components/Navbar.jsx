@@ -7,10 +7,11 @@ export default function Navbar() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // JWT에서 roles 꺼내기
   const isAdmin = (() => {
+    if (!token) return false
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]))
+      const raw = token.startsWith('Bearer ') ? token.slice(7) : token
+      const payload = JSON.parse(atob(raw.split('.')[1]))
       return payload.roles === 'ROLE_ADMIN'
     } catch {
       return false
@@ -24,28 +25,30 @@ export default function Navbar() {
 
   return (
     <nav className={styles.nav}>
-      <div className={styles.inner}>
+      {/* 메인 영역 */}
+      <div className={styles.mainSection}>
         <Link to="/" className={styles.logo}>colonydrop0079</Link>
 
         <div className={styles.links}>
           <Link to="/products" className={styles.link}>전체 상품</Link>
           {token && <Link to="/orders" className={styles.link}>주문 내역</Link>}
-          {token && <Link to="/support" className={styles.link}>고객센터</Link>}  {/* ← 추가 */}
-          {token && isAdmin && <Link to="/admin" className={styles.link}>관리자</Link>}  {/* ← 추가 */}
+          {token && <Link to="/support/my" className={styles.link}>고객센터</Link>}
+          {token && isAdmin && <Link to="/admin" className={styles.link}>관리자</Link>}
         </div>
+      </div>
 
-        <div className={styles.right}>
-          {token ? (
-            <>
-              <span className={styles.nickname}>{nickname ?? '회원'}님</span>
-              <button className={styles.logoutBtn} onClick={handleLogout}>로그아웃</button>
-            </>
-          ) : (
-            <button className={styles.loginBtn} onClick={() => navigate('/login', { state: { from: location.pathname } })}>
-              로그인
-            </button>
-          )}
-        </div>
+      {/* 채팅창 위 오른쪽 영역 */}
+      <div className={styles.chatSection}>
+        {token ? (
+          <>
+            <span className={styles.nickname}>{nickname ?? '회원'}님</span>
+            <button className={styles.logoutBtn} onClick={handleLogout}>로그아웃</button>
+          </>
+        ) : (
+          <button className={styles.loginBtn} onClick={() => navigate('/login', { state: { from: location.pathname } })}>
+            로그인
+          </button>
+        )}
       </div>
     </nav>
   )
