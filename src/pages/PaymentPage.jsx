@@ -151,10 +151,17 @@ export default function PaymentPage() {
                       merchantUid: rsp.merchant_uid,
                     })
                     navigate('/orders')
-                  } catch {
-                    setError('결제 검증에 실패했습니다. 고객센터에 문의해주세요.')
+                  } catch(err) {
+                    // 백엔드에서 SOLD_OUT 던진 경우 → 품절 안내 (결제는 자동 취소됨)
+                    const errMsg = err?.response?.data ?? ''
+                    if (typeof errMsg === 'string' && errMsg.includes('SOLD_OUT')) {
+                      setError('아쉽게도 한발 늦었습니다. 상품이 품절되어 결제가 자동 취소되었습니다.')
+                    } else {
+                      setError('결제 검증에 실패했습니다. 고객센터에 문의해주세요.')
+                    }
                     setPaying(false)
                   }
+                  
                   resolve()
                 }
               )
