@@ -9,7 +9,7 @@ export default function Footer() {
           <p><span>상호명</span> 콜로니드롭0079 (ColonyDrop0079)</p>
           <p><span>대표자명</span> 김정규</p>
           <p><span>사업자등록번호</span> 726-58-00869</p>
-          <p><span>주소</span> 경기도 수원시 권선구 권선로 509번길 5</p>
+          <p><span>주소</span> 경기도 수원시 권선구 권선로 </p>
           <p><span>유선번호</span> 010-XXXX-XXXX</p>
           <p><span>이메일</span> wjdrb0918@naver.com</p>
         </div>
