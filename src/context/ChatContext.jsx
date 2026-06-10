@@ -28,17 +28,26 @@ export function ChatProvider({ children }) {
   const [roomUsers, setRoomUsers] = useState(INITIAL_ROOM_USERS)
   const currentRoomRef = useRef('free')
   const chatSubRef = useRef(null)
+  const loadingRoomsRef = useRef(new Set())
+  const wsBufferRef = useRef({})
 
   useEffect(() => {
     currentRoomRef.current = currentRoom
   }, [currentRoom])
 
   const loadHistory = useCallback(async (roomType) => {
+    loadingRoomsRef.current.add(roomType)
+    wsBufferRef.current[roomType] = []
     try {
       const res = await api.get(`/api/chat/history/${roomType}`)
-      setMessages(prev => ({ ...prev, [roomType]: (res.data || []).reverse() }))
+      const serverMsgs = (res.data || []).reverse()
+      const buffered = wsBufferRef.current[roomType] || []
+      setMessages(prev => ({ ...prev, [roomType]: [...serverMsgs, ...buffered] }))
     } catch (e) {
       console.error('채팅 히스토리 로드 실패', e)
+    } finally {
+      loadingRoomsRef.current.delete(roomType)
+      wsBufferRef.current[roomType] = []
     }
   }, [])
 
@@ -51,10 +60,14 @@ export function ChatProvider({ children }) {
       try {
         const msg = JSON.parse(frame.body)
         const key = msg.roomType?.toLowerCase() ?? roomType
-        setMessages(prev => ({
-          ...prev,
-          [key]: [...(prev[key] || []), msg],
-        }))
+        if (loadingRoomsRef.current.has(key)) {
+          wsBufferRef.current[key] = [...(wsBufferRef.current[key] || []), msg]
+        } else {
+          setMessages(prev => ({
+            ...prev,
+            [key]: [...(prev[key] || []), msg],
+          }))
+        }
       } catch {}
     })
   }, [])
