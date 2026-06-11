@@ -7,6 +7,7 @@ export default function ChatSidebar() {
   const { connected, currentRoom, messages, switchRoom, sendMessage, ROOMS } = useChat()
   const { token, user } = useAuth()
   const [input, setInput] = useState('')
+  const [isOpen, setIsOpen] = useState(false)
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
 
@@ -34,7 +35,14 @@ export default function ChatSidebar() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.panel}>
+      <button
+        className={styles.toggleBtn}
+        onClick={() => setIsOpen(prev => !prev)}
+        aria-label="채팅 열기/닫기"
+      >
+        {isOpen ? '✕' : '💬'}
+      </button>
+      <div className={`${styles.panel} ${isOpen ? styles.panelOpen : ''}`}>
         <div className={styles.header}>
           <span className={styles.headerTitle}>실시간 채팅</span>
           <span className={`${styles.dot} ${connected ? styles.dotOn : ''}`} />

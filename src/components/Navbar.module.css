@@ -100,3 +100,103 @@
   border-color: #aaa;
   color: #555;
 }
+
+/* ── Mobile ── */
+.hamburger {
+  display: none;
+}
+
+.mobileMenu {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .chatSection {
+    display: none;
+  }
+
+  .links {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px 8px;
+    color: #1a1a1a;
+    line-height: 1;
+  }
+
+  .mobileMenu {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-bottom: 1px solid #e8e8e8;
+    padding: 8px 24px 16px;
+    z-index: 299;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .mobileLink {
+    font-size: 15px;
+    font-weight: 500;
+    color: #444;
+    padding: 13px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .mobileLink:last-of-type {
+    border-bottom: none;
+  }
+
+  .mobileDivider {
+    height: 1px;
+    background: #e8e8e8;
+    margin: 4px 0 8px;
+  }
+
+  .mobileUser {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+  }
+
+  .mobileNickname {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .mobileLogoutBtn {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 12px;
+    color: #888;
+    cursor: pointer;
+  }
+
+  .mobileLoginBtn {
+    width: 100%;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+}

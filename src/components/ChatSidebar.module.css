@@ -291,3 +291,50 @@
   padding: 8px 0;
   margin: 0;
 }
+
+/* ── Mobile ── */
+.toggleBtn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .container {
+    pointer-events: none;
+  }
+
+  .toggleBtn {
+    pointer-events: all;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 20px;
+    right: 16px;
+    z-index: 201;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    transition: background 0.15s;
+  }
+
+  .toggleBtn:hover {
+    background: #333;
+  }
+
+  .panel {
+    pointer-events: all;
+    width: 100vw;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+  }
+
+  .panelOpen {
+    transform: translateX(0);
+  }
+}

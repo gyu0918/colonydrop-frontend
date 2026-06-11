@@ -35,7 +35,7 @@ function AppLayout() {
   return (
     <>
       {!isAdmin && <Navbar />}
-      <div style={!isAdmin ? { marginRight: '300px' } : {}}>
+      <div className={!isAdmin ? 'appContent' : ''}>
         <Routes>
           {/* 일반 라우트 */}
           <Route path="/" element={<HomePage />} />
