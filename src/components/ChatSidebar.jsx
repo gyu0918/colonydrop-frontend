@@ -66,9 +66,10 @@ export default function ChatSidebar() {
           ) : (
             currentMessages.map((msg, i) => {
               const isMe = myId && msg.senderId === myId
+              const displayName = msg.senderName ?? msg.senderId
               return (
                 <div key={i} className={`${styles.msgRow} ${isMe ? styles.msgRowMe : ''}`}>
-                  {!isMe && <span className={styles.sender}>{msg.senderId}</span>}
+                  {!isMe && <span className={styles.sender}>{displayName}</span>}
                   <div className={`${styles.bubble} ${isMe ? styles.bubbleMe : styles.bubbleOther}`}>
                     {msg.content}
                   </div>
