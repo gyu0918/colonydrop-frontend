@@ -68,6 +68,10 @@ const PUBLIC_PATHS = ['/', '/products', '/login']
 const isPublicPath = (path) =>
   PUBLIC_PATHS.some((p) => path === p || path.startsWith(p + '/'))
 
+// 진행 중인 refresh Promise를 모듈 스코프에서 공유
+// 동시에 여러 401이 발생해도 refresh 호출은 1번만 나감
+let refreshingPromise = null
+
 // 응답 인터셉터: 401 시 refresh token으로 재발급 시도
 api.interceptors.response.use(
   (response) => response,
@@ -76,24 +80,37 @@ api.interceptors.response.use(
 
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true
-      try {
-        const res = await axios.post(
+
+      if (!refreshingPromise) {
+        refreshingPromise = axios.post(
           `${import.meta.env.VITE_API_URL}/api/auth/refresh`,
           {},
           { withCredentials: true }
         )
-        const newToken = res.headers['authorization']?.replace('Bearer ', '')
-        if (newToken) {
-          localStorage.setItem('accessToken', newToken)
-          original.headers['Authorization'] = `Bearer ${newToken}`
-          return api(original)
-        }
+          .then((res) => {
+            const newToken = res.headers['authorization']?.replace('Bearer ', '')
+            if (!newToken) throw new Error('no token')
+            localStorage.setItem('accessToken', newToken)
+            return newToken
+          })
+          .catch((err) => {
+            localStorage.removeItem('accessToken')
+            if (!isPublicPath(window.location.pathname)) {
+              window.location.href = '/login'
+            }
+            throw err
+          })
+          .finally(() => {
+            refreshingPromise = null
+          })
+      }
+
+      try {
+        const newToken = await refreshingPromise
+        original.headers['Authorization'] = `Bearer ${newToken}`
+        return api(original)
       } catch {
-        localStorage.removeItem('accessToken')
-        // 공개 페이지면 로그인으로 안 보냄
-        if (!isPublicPath(window.location.pathname)) {
-          window.location.href = '/login'
-        }
+        return Promise.reject(error)
       }
     }
 
