@@ -226,6 +226,7 @@ export default function OrderDetailPage() {
   const [refunding, setRefunding] = useState(false)
   const [refundError, setRefundError] = useState('')
   const [refundSuccess, setRefundSuccess] = useState(false)
+  const [refundCooldown, setRefundCooldown] = useState(0)
 
   const [showAddrModal, setShowAddrModal] = useState(false)
   const [addrForm, setAddrForm] = useState({ buyerName: '', buyerTel: '', buyerAddr: '', buyerAddrDetail: '' })
@@ -238,6 +239,12 @@ export default function OrderDetailPage() {
       .catch(() => setError('주문 정보를 불러오는 데 실패했습니다.'))
       .finally(() => setLoading(false))
   }, [merchantUid])
+
+  useEffect(() => {
+    if (refundCooldown <= 0) return
+    const timer = setTimeout(() => setRefundCooldown((s) => s - 1), 1000)
+    return () => clearTimeout(timer)
+  }, [refundCooldown])
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '-'
@@ -259,7 +266,17 @@ export default function OrderDetailPage() {
       setOrder((prev) => ({ ...prev, status: 'REFUNDED' }))
       setRefundSuccess(true)
       setShowModal(false)
-    } catch {
+    } catch (err) {
+      const msg = err?.response?.data
+      if (typeof msg === 'string' && msg.startsWith('REFUND_TOO_SOON:')) {
+        const seconds = parseInt(msg.split(':')[1], 10)
+        if (!isNaN(seconds) && seconds > 0) {
+          setRefundCooldown(seconds)
+          setRefundError('')
+          setShowModal(false)
+          return
+        }
+      }
       setRefundError('환불 처리에 실패했습니다. 고객센터에 문의해주세요.')
     } finally {
       setRefunding(false)
@@ -440,8 +457,9 @@ export default function OrderDetailPage() {
           <button
             className={styles.refundBtn}
             onClick={() => { setShowModal(true); setRefundError('') }}
+            disabled={refundCooldown > 0}
           >
-            환불 신청
+            {refundCooldown > 0 ? `${refundCooldown}초 후 환불 가능합니다` : '환불 신청'}
           </button>
         )}
 
